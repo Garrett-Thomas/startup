@@ -10,37 +10,33 @@
 
   <meta name="viewport" content="width=device-width,initial-scale=1" />
 
-  <meta name="description" content="" />
-
-  <link rel="icon" href="favicon.png">
-
 </head>
 
 <body>
 <header>
-    <div class="maintext">
-        <h1>sgame.click</h1>
-    </div>
+    <h1>sgame.click</h1>
     <nav>
     <a href="/login.html">Login</a>
     <a href="/register.html">Register</a>
     <a href="/leaderboard.html">Leaderboard</a>
+    <h3>Visiting us from: ${Country} (Placeholder for country api call)</h3>
 </nav>
 </header>
-<div class="mainbody">
-    <button onclick="window.location.href='./game.html'">Play</button>
+<main>
+    <!-- <button onclick="window.location.href='./game.html'">Play</button> -->
     <form action="/game.html">
         <label for="name">Your Name</label>
         <input type="text" id="name"><br><br>
-        <input type="submit">
+        <input type="submit" value="play">
     </form>
-</div>
+</main>
 
 <footer>
-
-    <h3>
-        G&T Productions
-    </h3>
+    
+<h3>
+    <a href="https://github.com/Garrett-Thomas">Github</a>
+</h3>
+        
 </footer>
 </body>
 </html>
