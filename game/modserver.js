@@ -183,6 +183,8 @@ function game() {
 
 function deleteSockets() {
 
+
+    // Although I'm iterating over stuff I'm deleting there doesn't seem to be an issue
     for (const [sockId, time] of socketLastSeen.entries()) {
        
         // This is necessary because socket might be added
@@ -192,9 +194,24 @@ function deleteSockets() {
 
         const currGameStatus = gameIDToGame.get(sockToGame.get(sockId)).status;
 
-         if (Date.now() - time > PLAYER_TIMEOUT ){
-            deletePlayer(sockId);
+         if (Date.now() - time > PLAYER_TIMEOUT  && currGameStatus == gameStatus.WAITING){
+            // There might be an issue with this call happening at the same time
+            // that a new client is looking for a game
+            deleteGames([sockId]);
 
+         }
+
+         // We have 2 players guranteed connected
+         if (Date.now() - time > PLAYER_TIMEOUT  && currGameStatus == gameStatus.GAME_START){
+            const activePlayer = gameIDToGame.get(sockToGame.get(sockId)).players.filter((player) => sockId != player.socketId)[0];
+            idToSocket.get(activePlayer.socketId).emit('game_start disconnect', {msg: "Opponent disconnected"});
+
+            deleteGames(gameIDToGame.get(activePlayer.gameId).players.filter((player)=> player.socketId == sockId));
+
+         }
+
+         if (Date.now() - time > PLAYER_TIMEOUT  && currGameStatus == gameStatus.PLAYING){
+            makeWinners([gameIDToGame.get(sockToGame.get(sockId)).players.filter((player) => sockId == player.socketId)]);
          }
         // if (Date.now() - time > 5000 && currGameStatus == gameStatus.WAITING) {
         //     deletePlayer(sockId);
@@ -270,7 +287,7 @@ function deletePlayer(socketId) {
         idToSocket.delete(socketId);
     }
     catch (err) {
-        console.error(`Error: ${err}`);
+        console.error(`Error deleting player: ${err}`);
     }
     console.log(`Removing Player ${socketId}`);
 }
@@ -284,8 +301,8 @@ function heartbeat() {
     gameIDToGame.forEach((value, key) => {
 
 
-        const startTime = Date.now() + 3000;
         if (value.players.length == 2 && value.status == gameStatus.WAITING) {
+            const startTime = Date.now() + 3000;
             value.status = gameStatus.GAME_START;
             value.players.forEach((player) => {
 

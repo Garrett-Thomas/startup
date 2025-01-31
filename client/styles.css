@@ -1,0 +1,43 @@
+/* header{
+    display:flex;
+    flex-direction: column;
+    flex: 0 0 1;
+    background-color: antiquewhite;
+} */
+
+/* .flex-row{
+    display:flex;
+    flex-direction:row;
+    justify-content: space-evenly;
+    flex: 0 0 1;
+}
+
+.text-center{
+    text-align: center;
+} */
+
+.ff-verona{
+    font-family: 'Verona'
+}
+.vh-90{
+    height: 90vh;
+}
+.nav-padding{
+    padding-top: 5em;
+}
+
+.animate {
+    animation: 2s linear 1s ease-in-out; /* Adjust duration and timing function */
+  }
+  
+  @keyframes fade-in-out {
+    0% {
+      opacity: .2; /* Start invisible */
+    }
+    50% {
+      opacity: 1; /* Fully visible */
+    }
+    100% {
+      opacity: .5; /* Back to invisible */
+    }
+  }

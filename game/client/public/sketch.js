@@ -1,19 +1,20 @@
 const UPDATE_TIME = 1000 / 60;
 const DEFAULT_TEXT_SIZE = 20;
 
-var { Engine, Bodies, Body, World } = Matter;
-var socket;
-var ARENA_RADIUS;
-var players = [];
-var player = null;
-var enemy = null;
+let { Engine, Bodies, Body, World } = Matter;
+let socket;
+let ARENA_RADIUS;
+let players = [];
+let player = null;
+let enemy = null;
 
-var p5Canvas = null;
+let p5Canvas = null;
 
-var boosting = false;
-var canBoost = true;
-var boostTimer = null;
-var elapsedTime = 0;
+let boosting = false;
+let canBoost = true;
+let boostTimer = null;
+let elapsedTime = 0;
+let gameStartTimerId = null;
 
 const BOOST_TIME = 3000;
 const BOOST_RECOVERY_TIME = 100;
@@ -34,7 +35,8 @@ let gameState = {
 	WAITING: "waiting",
 	GAME_START: "game_start",
 	PLAYING: "playing",
-	GAME_OVER: "game_over"
+	GAME_OVER: "game_over",
+	GAME_START_DISCONNECT: "game_start_disconnect"
 }
 
 let state = null;
@@ -158,12 +160,23 @@ function setup() {
 	socket.once('game_start', (data) => {
 		state = gameState.GAME_START
 		gameStartTime = data.startTime;
-		setTimeout(() => {
+
+		gameStartTimerId = setTimeout(() => {
 			state = gameState.PLAYING;
 
 		}, gameStartTime - Date.now());
 
 	});
+
+	socket.once("game_start disconnect", (data)=>{
+		state = gameState.GAME_START_DISCONNECT;
+		gameOverMsg = data.msg;
+		clearInterval(gameStartTimerId);
+		setTimeout(() => {
+			window.location.href = "./index.html"
+		}, 5000);
+
+	})
 	socket.once("game_end", (data) => {
 
 		state = gameState.GAME_OVER;
@@ -225,6 +238,11 @@ function setup() {
 // View of world should remain the same regardless of screen size
 
 function draw() {
+
+	if (state === gameState.GAME_START_DISCONNECT){
+		screenDraw.drawGameOver(gameOverMsg);
+
+	}
 	if (state === gameState.WAITING) {
 		// draw waiting screen
 		screenDraw.drawWaitScreen(playerBody.position.x, playerBody.position.y);
