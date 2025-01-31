@@ -23,9 +23,9 @@ const io = new Server(server, {
 const PORT = 4000 || process.env.PORT;
 
 const ARENA_RADIUS = 1200;
-const HEARTBEAT_TIME = 1000 / 5;
+const HEARTBEAT_TIME = 1000 / 60;
 const DEFAULT_RADIUS = 50;
-const PLAYER_TIMEOUT = 200;
+const PLAYER_TIMEOUT = 100;
 const gameStatus = {
     WAITING: "waiting",
     PLAYING: "playing",
@@ -33,7 +33,7 @@ const gameStatus = {
     GAME_START: "game_start"
 }
 
-const spawnOptions = [[[-1, 0], [1, 0]], [0, 1], [0, -1]];
+const spawnOptions = [[[-1, 0], [1, 0]], [[0, 1], [0, -1]]];
 
 let playerOptions = {
     friction: 1,
@@ -89,7 +89,6 @@ function userSetup(socket, name, color) {
 
     for (const [key, value] of gameIDToGame.entries()) {
         // Player can join this game
-
         if (value.players.length == 1) {
             gameId = key;
             playerAdded = true;
@@ -103,6 +102,7 @@ function userSetup(socket, name, color) {
             const p = new Player(x, y, DEFAULT_RADIUS, socket.id, name, color, key);
 
             value.players.push(p);
+
 
             playerBodies.set(socket.id, body);
 
@@ -168,13 +168,15 @@ function game() {
     2. Delete Games & Players as needed
     3. Send heartbeat to players
     4. If game stalled status != waiting && game.players == 1 
+    
+    * Now need to handle disconnect events when the status is waiting and game_start
     */
 
     let winners = heartbeat();
 
     makeWinners(winners);
     deleteGames(winners);
-    // deleteSockets();
+    deleteSockets();
 
 }
 
@@ -182,23 +184,29 @@ function game() {
 function deleteSockets() {
 
     for (const [sockId, time] of socketLastSeen.entries()) {
+       
+        // This is necessary because socket might be added
+        // I think this is possible because the client might send a ping
+        // Before all objects have been created server side
+        if(!sockToGame.has(sockId)) continue;
+
         const currGameStatus = gameIDToGame.get(sockToGame.get(sockId)).status;
 
-        //  if (Date.now() - time > PLAYER_TIMEOUT ){
+         if (Date.now() - time > PLAYER_TIMEOUT ){
+            deletePlayer(sockId);
+
+         }
+        // if (Date.now() - time > 5000 && currGameStatus == gameStatus.WAITING) {
         //     deletePlayer(sockId);
-        //  }
-        
-        if (Date.now() - time > 5000 && currGameStatus == gameStatus.WAITING) {
-            deletePlayer(sockId);
-        }
+        // }
 
-        if (Date.now() - time > 1000 && currGameStatus == gameStatus.PLAYING) {
-            deletePlayer(sockId);
-        }
+        // if (Date.now() - time > 1000 && currGameStatus == gameStatus.PLAYING) {
+        //     deletePlayer(sockId);
+        // }
 
-        if (Date.now() - time > 5000 && currGameStatus == gameStatus.GAME_START) {
-            deletePlayer(sockId);
-        }
+        // if (Date.now() - time > 5000 && currGameStatus == gameStatus.GAME_START) {
+        //     deletePlayer(sockId);
+        // }
 
     }
 
@@ -262,7 +270,7 @@ function deletePlayer(socketId) {
         idToSocket.delete(socketId);
     }
     catch (err) {
-        console.error(err);
+        console.error(`Error: ${err}`);
     }
     console.log(`Removing Player ${socketId}`);
 }
@@ -293,17 +301,12 @@ function heartbeat() {
 
         }
         else if (value.players.length == 2 && value.status === gameStatus.PLAYING) {
-           console.log(value.players);
-            // Engine.update throws error
+
+
+            // Suspect its because the client feeds NAN in updates 
             Engine.update(value.engine, HEARTBEAT_TIME);
 
             value.players.forEach((player) => {
-                
-                // Not quite sure why I wrote this line
-                // if (value.players.length == 1 && value.status != gameStatus.WAITING) {
-                //     value.status = gameStatus.WON;
-                //     winners.push(player);
-                // }
 
                 if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
                     value.status = gameStatus.WON;
@@ -333,7 +336,6 @@ function heartbeat() {
 io.on("connection", (socket) => {
 
     socket.on("update", (data) => {
-
         try {
             if (socketLastSeen.has(socket.id)) {
                 socketLastSeen.set(socket.id, Date.now());
@@ -347,7 +349,7 @@ io.on("connection", (socket) => {
 
     });
 
-    socket.on("ping", (data) => {
+    socket.on("ping", () => {
         socketLastSeen.set(socket.id, Date.now());
     });
 

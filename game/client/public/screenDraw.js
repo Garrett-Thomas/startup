@@ -65,8 +65,6 @@ static _constrainEnd(endPoint, arenaSize, gridSize) {
 		scale(scle);
 		translate(-playerX, -playerY);
 
-		console.log(playerX, playerY);
-
 		// This codeblock ensures that only visible blocks on the
 		// grid are drawn. Speeds up rendering
 		let startX = Math.floor(

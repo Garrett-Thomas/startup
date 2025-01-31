@@ -225,7 +225,6 @@ function setup() {
 // View of world should remain the same regardless of screen size
 
 function draw() {
-	console.log(player);
 	if (state === gameState.WAITING) {
 		// draw waiting screen
 		screenDraw.drawWaitScreen(playerBody.position.x, playerBody.position.y);
@@ -253,7 +252,6 @@ function draw() {
 
 		let x = mouseX;
 		let y = mouseY;
-		console.log(x, y);
 		player.update(createVector(x - width / 2, y - height / 2));
 		player.draw();
 
@@ -312,6 +310,7 @@ function draw() {
 			gameId: player.gameId,
 		};
 
+		console.log(p);
 		socket.emit("update", p);
 
 	}
