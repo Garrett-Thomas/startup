@@ -104,7 +104,7 @@ document.addEventListener("keypress", () => {
 		loop();
 	}
 });
-window.addEventListener('beforeunload', (event)=>{
+window.addEventListener('beforeunload', (event) => {
 	socket.disconnect();
 	event.preventDefault();
 })
@@ -115,12 +115,12 @@ function getScale() {
 	return ((10 / player.r));
 }
 
-function sendPlayerData(name){
+function sendPlayerData(name) {
 
-	socket.emit("join", {playerName: name, color: 0});
+	socket.emit("join", { playerName: name, color: 0 });
 }
 
-function getPlayerData(){
+function getPlayerData() {
 
 	socket.once("init_data", (data) => {
 		player = new Tank(data.player.x, data.player.y, data.player.r, data.player.socketId, data.player.name, data.player.gameId);
@@ -154,84 +154,94 @@ function setup() {
 		windowResized();
 
 	}
-	
-		socket.once('game_start', (data)=> {
-			state = gameState.GAME_START
-			gameStartTime = data.startTime;
-			setTimeout(()=>{
-				state = gameState.PLAYING;
-				
-			}, gameStartTime - Date.now());
 
-		});
-	socket.once("game_end", (data) =>{
+	socket.once('game_start', (data) => {
+		state = gameState.GAME_START
+		gameStartTime = data.startTime;
+		setTimeout(() => {
+			state = gameState.PLAYING;
+
+		}, gameStartTime - Date.now());
+
+	});
+	socket.once("game_end", (data) => {
 
 		state = gameState.GAME_OVER;
-		gameOverMsg = data.msg;	
+		gameOverMsg = data.msg;
 
-		// setTimeout(()=>{
-		// 	window.location.href = "./index.html"
-		// }, 5000);
+		setTimeout(() => {
+			window.location.href = "./index.html"
+		}, 5000);
 	});
 
 	socket.on("heartbeat", (data) => {
 
-		if(player != null){
-		players.length = 0;
-		data.forEach((element) => {
-			
-			if (element.socketId == player.socketId) {
-				player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId);
+		if (player != null) {
+			players.length = 0;
+			data.forEach((element) => {
+
+				if (element.socketId == player.socketId) {
+					player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId);
 
 
-			} 
-			else {
-				enemy = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId);
-			}
-		});
+				}
+				else {
+					enemy = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId);
+				}
+			});
 
-		// Step it 16ms + deltaTime
-		Engine.update(engine, UPDATE_TIME);
+			// Step it 16ms + deltaTime
+			Engine.update(engine, UPDATE_TIME);
 
-		// Move physics body to position given on server
-		// translation start is relative to body which is why
-		// old.x - current.x
+			// Move physics body to position given on server
+			// translation start is relative to body which is why
+			// old.x - current.x
 
-		Body.translate(playerBody, {
-			x: player.x - playerBody.position.x,
-			y: player.y - playerBody.position.y,
-		});
+			Body.translate(playerBody, {
+				x: player.x - playerBody.position.x,
+				y: player.y - playerBody.position.y,
+			});
+
+			Body.applyForce(playerBody, { x: 0, y: 0 }, data.filter((element) => element.socketId == player.socketId)[0].vector);
+
+		}
+	});
+
+	let name = localStorage.getItem("playerName");
+
+	if (name == null) {
+		window.location.href = "./index.html";
 		
-		Body.applyForce(playerBody, { x: 0, y: 0 }, data.filter((element) => element.socketId == player.socketId)[0].vector);
-
-	}});
-
-	sendPlayerData("temp");
+	}
+	else{
+	sendPlayerData(name);
 	getPlayerData();
 
 	frameRate(60);
+	}
 }
 
 // Need to figure out how to scale by screen size too.
 // View of world should remain the same regardless of screen size
 
 function draw() {
-	if(state === gameState.WAITING){
+	console.log(player);
+	if (state === gameState.WAITING) {
 		// draw waiting screen
 		screenDraw.drawWaitScreen(playerBody.position.x, playerBody.position.y);
-		socket.emit('ping', {msg: state});
-	
+		socket.emit('ping', { msg: state });
+
 	}
 
-	if(state === gameState.GAME_START){
+	if (state === gameState.GAME_START) {
 		// draw game start screen
-		
-		socket.emit('ping', {msg: state});
+
+		socket.emit('ping', { msg: state });
 		screenDraw.drawGameStart(gameStartTime - Date.now());
 
 
 	}
-	if (state === gameState.GAME_OVER){
+	if (state === gameState.GAME_OVER) {
 		// draw game over screen and put user back to index.html/
 		screenDraw.drawGameOver(gameOverMsg);
 	}
@@ -239,7 +249,7 @@ function draw() {
 	if (state === gameState.PLAYING) {
 
 		screenDraw.drawGame(playerBody.position.x, playerBody.position.y, getScale(), ARENA_RADIUS, GRID_SIZE);
-	
+
 
 		let x = mouseX;
 		let y = mouseY;

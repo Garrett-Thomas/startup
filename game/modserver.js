@@ -23,9 +23,9 @@ const io = new Server(server, {
 const PORT = 4000 || process.env.PORT;
 
 const ARENA_RADIUS = 1200;
-const HEARTBEAT_TIME = 1000 / 60;
+const HEARTBEAT_TIME = 1000 / 5;
 const DEFAULT_RADIUS = 50;
-
+const PLAYER_TIMEOUT = 200;
 const gameStatus = {
     WAITING: "waiting",
     PLAYING: "playing",
@@ -93,15 +93,19 @@ function userSetup(socket, name, color) {
         if (value.players.length == 1) {
             gameId = key;
             playerAdded = true;
-            const x = value.spawnLocations[Math.abs(value.spawnChosen - 1)][0];
-            const y = value.spawnLocations[Math.abs(value.spawnChosen - 1)][1];
+            let x = (ARENA_RADIUS / 2) * value.spawnLocations[Math.abs(value.spawnChosen - 1)][0];
+            let y = (ARENA_RADIUS / 2) * value.spawnLocations[Math.abs(value.spawnChosen - 1)][1];
 
-            let body = Bodies.circle(x, y, DEFAULT_RADIUS, playerOptions);
+            const body = Bodies.circle(x, y, DEFAULT_RADIUS, playerOptions);
 
             World.add(value.engine.world, body);
+
             const p = new Player(x, y, DEFAULT_RADIUS, socket.id, name, color, key);
+
             value.players.push(p);
+
             playerBodies.set(socket.id, body);
+
             sockToGame.set(socket.id, gameId);
 
             break;
@@ -129,7 +133,7 @@ function userSetup(socket, name, color) {
             engine: engine,
             players: [],
             status: gameStatus.WAITING,
-            busy: false,
+            gameStartTimerId: null,
             spawnLocations: spwn,
             spawnChosen: randLoc
         }
@@ -166,37 +170,24 @@ function game() {
     4. If game stalled status != waiting && game.players == 1 
     */
 
-    let { winners, gameReset } = heartbeat();
-
-    // for(var game of gameReset){
-    //     resetGame(game);
-    //     sendResetData(game);
-    // }
+    let winners = heartbeat();
 
     makeWinners(winners);
     deleteGames(winners);
-    deleteSockets();
+    // deleteSockets();
 
 }
 
-// function sendResetData(game){
-
-//     game.players.forEach((player) => {
-
-//         sendPlayerInitData(player, playerOptions);
-
-//         idToSocket.get(player.socketId).emit('game_start', { startTime: startTime });
-//     })
-
-
-
-// }
 
 function deleteSockets() {
 
     for (const [sockId, time] of socketLastSeen.entries()) {
         const currGameStatus = gameIDToGame.get(sockToGame.get(sockId)).status;
 
+        //  if (Date.now() - time > PLAYER_TIMEOUT ){
+        //     deletePlayer(sockId);
+        //  }
+        
         if (Date.now() - time > 5000 && currGameStatus == gameStatus.WAITING) {
             deletePlayer(sockId);
         }
@@ -244,12 +235,14 @@ function getMagnitude(x, y) {
 function deleteGames(winners) {
 
     for (const winner of winners) {
-
         const game = gameIDToGame.get(winner.gameId);
+
+        clearInterval(game.gameStartTimerId);
 
         game.players.forEach((p) => {
             deletePlayer(p.socketId);
         });
+
         gameIDToGame.delete(winner.gameId);
     }
 }
@@ -278,8 +271,7 @@ function heartbeat() {
 
     // Iterate through each game object to step the physics engine and
     // send the client updated data
-
-    let ret = { winners: [], gameReset: [] };
+    let winners = [];
 
     gameIDToGame.forEach((value, key) => {
 
@@ -295,30 +287,27 @@ function heartbeat() {
 
 
             // I think this is causing issues because players may disconnect during the Game_start phase, but this event still happens
-            setTimeout(() => {
+            value.gameStartTimerId = setTimeout(() => {
                 value.status = gameStatus.PLAYING;
             }, startTime - Date.now());
 
         }
         else if (value.players.length == 2 && value.status === gameStatus.PLAYING) {
-            
-            try{
-
+           console.log(value.players);
+            // Engine.update throws error
             Engine.update(value.engine, HEARTBEAT_TIME);
-            }
-            catch(err){
-                console.error(err, value);
-            }
 
-            value.players.every((player) => {
+            value.players.forEach((player) => {
+                
+                // Not quite sure why I wrote this line
+                // if (value.players.length == 1 && value.status != gameStatus.WAITING) {
+                //     value.status = gameStatus.WON;
+                //     winners.push(player);
+                // }
 
-                if (value.players.length == 1 && value.status != gameStatus.WAITING) {
-                    value.status = gameStatus.WON;
-                    ret.winners.push(player);
-                }
                 if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
                     value.status = gameStatus.WON;
-                    ret.winners.push(player);
+                    winners.push(player);
                 }
 
                 const { x, y } = playerBodies.get(player.socketId).position;
@@ -329,16 +318,16 @@ function heartbeat() {
             });
         }
 
-
+      
         value.players.forEach((player) => {
+            
             idToSocket.get(player.socketId).emit('heartbeat', value.players);
         });
-
     });
 
 
+        return winners;
 
-    return ret;
 }
 
 io.on("connection", (socket) => {
