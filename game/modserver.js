@@ -22,7 +22,7 @@ const io = new Server(server, {
 
 const PORT = 4000 || process.env.PORT;
 
-const ARENA_RADIUS = 1200;
+const ARENA_RADIUS = 2000;
 const HEARTBEAT_TIME = 1000 / 60;
 const DEFAULT_RADIUS = 50;
 const PLAYER_TIMEOUT = 100;
@@ -262,8 +262,9 @@ function deleteGames(winners) {
     for (const winner of winners) {
         const game = gameIDToGame.get(winner.gameId);
 
+        if(game.gameStartTimerId != null){
         clearInterval(game.gameStartTimerId);
-
+}
         game.players.forEach((p) => {
             deletePlayer(p.socketId);
         });
@@ -372,7 +373,7 @@ io.on("connection", (socket) => {
 
 
     socket.once("join", (data) => {
-
+        console.log(data.playerName);
         userSetup(socket, data.playerName, data.color);
     })
 
