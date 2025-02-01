@@ -14,12 +14,12 @@
 
 </head>
 
-<body>
+<body class="gradient-home">
 
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid p-2">
-            <a class="navbar-brand fs-3" href="./index.html">Sgame.click</a>
+            <a class="navbar-brand fs-3 animate-font-weight" href="./index.html">Sgame.click</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggler"
                 aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -40,22 +40,38 @@
             </div>
         </div>
     </nav>
-    <main class="vh-90 container">
-        <form class="vh-90 row align-items-center" action="/game.html">
-            <div class="container w-50">
-                <div class="row">
-                    <input class="mb-5 p-3 text-center animate" placeholder="enter name" type="text" id="name">
-                </div>
 
-                <div class="row">
-                    <input class="ff-verona fs-4 text-body-secondary" type="submit" value="play">
-                </div>
-        </form>
+    <main>
 
+        <div class="mt-5 container-fluid">
+
+            <div class="row justify-content-center">
+                <form class="card max-width-login p-5" action="/game.html">
+
+
+                    <div class="row text-center">
+
+                        <div class="col p-2">
+                            <h3>Welcome Player</h3>
+                        </div>
+                    </div>
+
+                    <div class="row text-center">
+
+                        <div class="col ">
+
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control text-center" placeholder="Enter Name" aria-label="Recipient's username" aria-describedby="button-addon2">
+                                <button class="btn btn-outline-secondary" type="button" id="button-addon2">Play</button>
+                              </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </main>
 
-    <footer class="footer fixed-bottom  text-center pt-1 m-auto bg-secondary">
+    <footer class="footer fixed-bottom  text-center pt-1 m-auto background-light-grey">
         <a href="https://github.com/Garrett-Thomas">
             <svg height="64" aria-hidden="true" viewBox="0 0 24 24" version="1.1" width="64" data-view-component="true"
                 class="octicon octicon-mark-github v-align-middle">
