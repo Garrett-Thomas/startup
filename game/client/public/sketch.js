@@ -4,7 +4,6 @@ const DEFAULT_TEXT_SIZE = 20;
 let { Engine, Bodies, Body, World } = Matter;
 let socket;
 let ARENA_RADIUS;
-let players = [];
 let player = null;
 let enemy = null;
 
@@ -17,7 +16,7 @@ let elapsedTime = 0;
 let gameStartTimerId = null;
 
 const BOOST_TIME = 3000;
-const BOOST_RECOVERY_TIME = 100;
+const BOOST_RECOVERY_TIME = 1000;
 const BOOST_AMOUNT = 0.5;
 const GRID_SIZE = 100;
 
@@ -38,6 +37,7 @@ let gameState = {
 	GAME_OVER: "game_over",
 	GAME_START_DISCONNECT: "game_start_disconnect"
 }
+let oldTime = 0;
 
 let state = null;
 let gameOverMsg = "";
@@ -52,7 +52,6 @@ let obstacles = null;
 
 function reset() {
 	World.clear(world, true);
-	players.length = 0;
 	playerBody = null;
 	socket = null;
 	timer = null;
@@ -200,10 +199,13 @@ function setup() {
 	});
 
 	socket.on("heartbeat", (data) => {
+		
+		const playerList = data.players;
+		let timing = data.timing;
 
+		console.log(data.timing.timestamp);
 		if (player != null && world != null) {
-			players.length = 0;
-			data.forEach((element) => {
+			playerList.forEach((element) => {
 
 				if (element.socketId == player.socketId) {
 					player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId);
@@ -216,8 +218,8 @@ function setup() {
 			});
 
 			// Step it 16ms + deltaTime
-			Engine.update(engine, UPDATE_TIME);
-
+			Engine.update(engine, timing - oldTime);
+			oldTime = timing;
 			// Move physics body to position given on server
 			// translation start is relative to body which is why
 			// old.x - current.x
@@ -227,7 +229,7 @@ function setup() {
 				y: player.y - playerBody.position.y,
 			});
 
-			Body.applyForce(playerBody, { x: 0, y: 0 }, data.filter((element) => element.socketId == player.socketId)[0].vector);
+			// Body.applyForce(playerBody, { x: 0, y: 0 }, playerList.filter((element) => element.socketId === player.socketId)[0].vector);
 
 		}
 	});
@@ -294,6 +296,7 @@ function draw() {
 
 		x2 += playerBody.position.x;
 		y2 += playerBody.position.y;
+		Body.applyForce(playerBody, {x: 0, y:0}, {x: x2, y: y2});	
 
 		line(playerBody.position.x, playerBody.position.y, x2, y2);
 
@@ -340,7 +343,6 @@ function draw() {
 			gameId: player.gameId,
 		};
 
-		console.log(p);
 		socket.emit("update", p);
 
 	}

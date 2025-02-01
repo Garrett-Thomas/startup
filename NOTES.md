@@ -8,3 +8,8 @@
 
 - Added needed html and included all semantic tags
 - Added playername placeholder
+
+
+
+# BUGS
+- Sometimes when the player's collide there is a large restitution. I suspect its because the client and the server are not synced so it causing "double hit" or something like that.

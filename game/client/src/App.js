@@ -1,55 +1,26 @@
 import "./App.css";
-//import Bumper from "./components/gameName.js";
-
-import React, {useState} from "react";
+import Login from "./Login";
+import Home from "./Home";
+import Register from "./Register";
+import React, { useState } from "react";
+import { BrowserRouter, Routes, Route } from 'react-router-dom'; 
+import Leaderboard from "./Leaderboard";
 
 function App() {
-	const [gameData, setGameData] = useState({
-		playerName: localStorage.getItem("playerName") || "",
-		gameStarted: false,
-	});
 
-	function nameChanged(e) {
-		setGameData((prevData) => {
-			return {...prevData, playerName: e.target.value};
-		});
+	return(
+		<BrowserRouter>
+      <Routes> 
+        <Route path="/login" element={<Login/>} /> 
+        <Route path="/register" element={<Register/>} /> 
+		<Route path="/leaderboard" element={<Leaderboard/>}/>
+        <Route path="*" element={<Home />} /> 
+      </Routes>
+    </BrowserRouter>
 
-		localStorage.setItem("playerName", e.target.value);
-	}
 
-	function submit(e) {
-		if (
-			(e.code === "Enter" || e.type === "click") &&
-			gameData.playerName !== "" &&
-			gameData.playerName.length <= 10
-		) {
-			setGameData((prevData) => {
-				return {...prevData, gameStarted: true};
-			});
 
-			document.location.href = "/game.html";
-		}
-	}
 
-	return (
-		<div className="App">
-	{/*			<Bumper /> */}
-
-			<div className="dataEntry">
-				<input
-					type="text"
-					name="playerName"
-					placeholder="Name"
-					value={gameData.playerName}
-					onChange={nameChanged}
-					onKeyPress={submit}
-					required={true}
-					maxLength={10}
-				/>
-
-				<button type="button" onClick={submit}>Play</button>
-			</div>
-		</div>
 	);
 }
 

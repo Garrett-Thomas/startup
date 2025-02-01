@@ -20,6 +20,7 @@ const io = new Server(server, {
     },
 });
 
+
 const PORT = 4000 || process.env.PORT;
 
 const ARENA_RADIUS = 2000;
@@ -38,10 +39,11 @@ const gameStatus = {
 const spawnOptions = [[[-1, 0], [1, 0]], [[0, 1], [0, -1]]];
 
 const PLAYER_OPTIONS = {
-    friction: 1,
-    density: 10,
-    restitution: 1,
-    frictionAir: 0.02,
+    friction: 0,
+    density: 1,
+    restitution: 0,
+    frictionAir: 0,
+    slop: -1
 };
 
 const OBSTACLE_OPTIONS = {
@@ -60,9 +62,6 @@ let gameIDToGame = new Map();
 let sockToGame = new Map();
 const socketLastSeen = new Map();
 const playerBodies = new Map();
-const staticBodies = new Map();
-
-
 
 setInterval(() => {
     game();
@@ -339,9 +338,7 @@ function heartbeat() {
         else if (value.players.length == 2 && value.status === gameStatus.PLAYING) {
 
 
-            // Suspect its because the client feeds NAN in updates 
             Engine.update(value.engine, HEARTBEAT_TIME);
-
             value.players.forEach((player) => {
 
                 // if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
@@ -360,7 +357,7 @@ function heartbeat() {
 
         value.players.forEach((player) => {
 
-            idToSocket.get(player.socketId).emit('heartbeat', value.players);
+            idToSocket.get(player.socketId).emit('heartbeat', {players: value.players, timing: value.engine.timing});
         });
     });
 
@@ -391,7 +388,6 @@ io.on("connection", (socket) => {
 
 
     socket.once("join", (data) => {
-        console.log(data.playerName);
         userSetup(socket, data.playerName, data.color);
     })
 
