@@ -26,6 +26,8 @@ const ARENA_RADIUS = 2000;
 const HEARTBEAT_TIME = 1000 / 60;
 const DEFAULT_RADIUS = 50;
 const PLAYER_TIMEOUT = 100;
+const OBSTACLE_RADIUS = 200;
+
 const gameStatus = {
     WAITING: "waiting",
     PLAYING: "playing",
@@ -35,14 +37,20 @@ const gameStatus = {
 
 const spawnOptions = [[[-1, 0], [1, 0]], [[0, 1], [0, -1]]];
 
-let playerOptions = {
+const PLAYER_OPTIONS = {
     friction: 1,
     density: 10,
-    restitution: -0.5,
+    restitution: 1,
     frictionAir: 0.02,
 };
 
-let worldOptions = {
+const OBSTACLE_OPTIONS = {
+    isStatic: true,
+    restitution: 0,
+    friction: 0,
+}
+
+const WORLD_OPTIONS = {
     gravity: { x: 0, y: 0 },
 };
 
@@ -52,11 +60,21 @@ let gameIDToGame = new Map();
 let sockToGame = new Map();
 const socketLastSeen = new Map();
 const playerBodies = new Map();
+const staticBodies = new Map();
+
+
 
 setInterval(() => {
     game();
 }, HEARTBEAT_TIME);
 
+class Obstacle {
+    constructor(x, y, r) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+    }
+}
 
 class Player {
     constructor(x, y, r, socketId, name = "", color = {}, gameId) {
@@ -95,7 +113,7 @@ function userSetup(socket, name, color) {
             let x = (ARENA_RADIUS / 2) * value.spawnLocations[Math.abs(value.spawnChosen - 1)][0];
             let y = (ARENA_RADIUS / 2) * value.spawnLocations[Math.abs(value.spawnChosen - 1)][1];
 
-            const body = Bodies.circle(x, y, DEFAULT_RADIUS, playerOptions);
+            const body = Bodies.circle(x, y, DEFAULT_RADIUS, PLAYER_OPTIONS);
 
             World.add(value.engine.world, body);
 
@@ -115,45 +133,60 @@ function userSetup(socket, name, color) {
     if (!playerAdded) {
         gameId = uuidv4();
 
-        let spwn = spawnOptions[Math.round(Math.random())]
-
+        const engine = Engine.create(WORLD_OPTIONS);
+        const spawnSet = Math.round(Math.random());
+        let spwn = spawnOptions[spawnSet];
         let randLoc = Math.round(Math.random());
 
-        let x = (ARENA_RADIUS / 2) * spwn[randLoc][0];
-        let y = (ARENA_RADIUS / 2) * spwn[randLoc][1];
-
-        const body = Bodies.circle(x, y, DEFAULT_RADIUS, playerOptions);
-        const engine = Engine.create(worldOptions);
-
-        World.add(engine.world, body);
-        playerBodies.set(socket.id, body);
-        sockToGame.set(socket.id, gameId);
 
         let gameObject = {
             engine: engine,
             players: [],
+            obstacles: [],
             status: gameStatus.WAITING,
             gameStartTimerId: null,
             spawnLocations: spwn,
             spawnChosen: randLoc
         }
 
-        gameObject.players.push(new Player(x, y, DEFAULT_RADIUS, socket.id, name, color, gameId));
+
+        let xPlayer = (ARENA_RADIUS / 2) * spwn[randLoc][0];
+        let yPlayer = (ARENA_RADIUS / 2) * spwn[randLoc][1];
+        const body = Bodies.circle(xPlayer, yPlayer, DEFAULT_RADIUS, PLAYER_OPTIONS);
+
+        gameObject.players.push(new Player(xPlayer, yPlayer, DEFAULT_RADIUS, socket.id, name, color, gameId));
+        World.add(engine.world, body);
+        playerBodies.set(socket.id, body);
+        sockToGame.set(socket.id, gameId);
+
+
+
+        for (let i = 0; i < 2; i++) {
+            let xOb = (ARENA_RADIUS / 2) * spawnOptions[Math.abs(spawnSet - 1)][i][0];
+            let yOb = (ARENA_RADIUS / 2) * spawnOptions[Math.abs(spawnSet - 1)][i][1];
+            const obBody = Bodies.circle(xOb, yOb, OBSTACLE_RADIUS, { isStatic: true });
+            World.add(engine.world, obBody);
+            gameObject.obstacles.push(new Obstacle(xOb, yOb, OBSTACLE_RADIUS));
+        }
+
         gameIDToGame.set(gameId, gameObject);
 
     }
 
 
-    sendPlayerInitData(gameIDToGame.get(gameId).players.filter((p) => p.socketId === socket.id)[0], ARENA_RADIUS, playerOptions);
+    sendPlayerInitData(socket.id, gameIDToGame.get(gameId));
 
 }
 
-function sendPlayerInitData(player, playerOptions) {
+function sendPlayerInitData(socketId, game) {
 
-    idToSocket.get(player.socketId).emit("init_data", {
-        player: player,
+    idToSocket.get(socketId).emit("init_data", {
+        player: game.players.filter((player) => player.socketId === socketId)[0],
+        obstacles: game.obstacles,
         ARENA_RADIUS: ARENA_RADIUS,
-        playerOptions,
+        PLAYER_OPTIONS,
+        OBSTACLE_OPTIONS,
+        WORLD_OPTIONS,
     });
 
 }
@@ -186,47 +219,33 @@ function deleteSockets() {
 
     // Although I'm iterating over stuff I'm deleting there doesn't seem to be an issue
     for (const [sockId, time] of socketLastSeen.entries()) {
-       
+
         // This is necessary because socket might be added
         // I think this is possible because the client might send a ping
         // Before all objects have been created server side
-        if(!sockToGame.has(sockId)) continue;
+        if (!sockToGame.has(sockId)) continue;
 
-        const currGameStatus = gameIDToGame.get(sockToGame.get(sockId)).status;
+        const currGame = gameIDToGame.get(sockToGame.get(sockId));
+        const currGameStatus = currGame.status;
 
-         if (Date.now() - time > PLAYER_TIMEOUT  && currGameStatus == gameStatus.WAITING){
+        if (Date.now() - time > PLAYER_TIMEOUT && currGameStatus == gameStatus.WAITING) {
             // There might be an issue with this call happening at the same time
             // that a new client is looking for a game
-            deleteGames([sockId]);
+            deleteGames(gameIDToGame.get(sockToGame.get(sockId)).players);
 
-         }
+        }
 
-         // We have 2 players guranteed connected
-         if (Date.now() - time > PLAYER_TIMEOUT  && currGameStatus == gameStatus.GAME_START){
+        // We have 2 players guranteed connected
+        else if (Date.now() - time > PLAYER_TIMEOUT && (currGameStatus == gameStatus.GAME_START || currGameStatus == gameStatus.PLAYING)) {
             const activePlayer = gameIDToGame.get(sockToGame.get(sockId)).players.filter((player) => sockId != player.socketId)[0];
-            idToSocket.get(activePlayer.socketId).emit('game_start disconnect', {msg: "Opponent disconnected"});
+            idToSocket.get(activePlayer.socketId).emit('game_start disconnect', { msg: "Opponent disconnected" });
 
-            deleteGames(gameIDToGame.get(activePlayer.gameId).players.filter((player)=> player.socketId == sockId));
+            deleteGames(gameIDToGame.get(activePlayer.gameId).players.filter((player) => player.socketId == sockId));
 
-         }
+        }
 
-         if (Date.now() - time > PLAYER_TIMEOUT  && currGameStatus == gameStatus.PLAYING){
-            makeWinners([gameIDToGame.get(sockToGame.get(sockId)).players.filter((player) => sockId == player.socketId)]);
-         }
-        // if (Date.now() - time > 5000 && currGameStatus == gameStatus.WAITING) {
-        //     deletePlayer(sockId);
-        // }
-
-        // if (Date.now() - time > 1000 && currGameStatus == gameStatus.PLAYING) {
-        //     deletePlayer(sockId);
-        // }
-
-        // if (Date.now() - time > 5000 && currGameStatus == gameStatus.GAME_START) {
-        //     deletePlayer(sockId);
-        // }
 
     }
-
 
 }
 
@@ -251,10 +270,8 @@ function makeWinners(winners) {
 
 
 }
-
-function getMagnitude(x, y) {
-
-    return (Math.sqrt((Math.pow(x, 2) + Math.pow(y, 2))));
+function getMagnitude(x, y){
+    return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 }
 
 function deleteGames(winners) {
@@ -262,9 +279,9 @@ function deleteGames(winners) {
     for (const winner of winners) {
         const game = gameIDToGame.get(winner.gameId);
 
-        if(game.gameStartTimerId != null){
-        clearInterval(game.gameStartTimerId);
-}
+        if (game.gameStartTimerId != null) {
+            clearInterval(game.gameStartTimerId);
+        }
         game.players.forEach((p) => {
             deletePlayer(p.socketId);
         });
@@ -288,6 +305,7 @@ function deletePlayer(socketId) {
         idToSocket.delete(socketId);
     }
     catch (err) {
+
         console.error(`Error deleting player: ${err}`);
     }
     console.log(`Removing Player ${socketId}`);
@@ -326,10 +344,10 @@ function heartbeat() {
 
             value.players.forEach((player) => {
 
-                if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
-                    value.status = gameStatus.WON;
-                    winners.push(player);
-                }
+                // if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
+                //     value.status = gameStatus.WON;
+                //     winners.push(player);
+                // }
 
                 const { x, y } = playerBodies.get(player.socketId).position;
                 player.x = x;
@@ -339,15 +357,15 @@ function heartbeat() {
             });
         }
 
-      
+
         value.players.forEach((player) => {
-            
+
             idToSocket.get(player.socketId).emit('heartbeat', value.players);
         });
     });
 
 
-        return winners;
+    return winners;
 
 }
 

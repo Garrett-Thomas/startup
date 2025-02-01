@@ -21,13 +21,13 @@ const BOOST_RECOVERY_TIME = 100;
 const BOOST_AMOUNT = 0.5;
 const GRID_SIZE = 100;
 
-let worldOptions = {
-	gravity: { x: 0, y: 0 },
-};
+// let  WORLD_OPTIONS = {
+// 	gravity: { x: 0, y: 0 },
+// };
 
 let canv = null;
-let engine = Engine.create(worldOptions);
-let world = engine.world;
+let engine = null 
+let world = null;
 let playerBody;
 let deathDone = false;
 let gameStartTime = 0;
@@ -41,6 +41,7 @@ let gameState = {
 
 let state = null;
 let gameOverMsg = "";
+let obstacles = null;
 
 // let leaderboard = new Leaderboard();
 
@@ -125,9 +126,20 @@ function sendPlayerData(name) {
 function getPlayerData() {
 
 	socket.once("init_data", (data) => {
+
+		console.log(data);
+
+		engine = Engine.create(data.WORLD_OPTIONS);
+		world = engine.world;
 		player = new Tank(data.player.x, data.player.y, data.player.r, data.player.socketId, data.player.name, data.player.gameId);
 
-		playerBody = Bodies.circle(data.player.x, data.player.y, data.player.r, data.playerOptions);
+		playerBody = Bodies.circle(data.player.x, data.player.y, data.player.r, data.PLAYER_OPTIONS);
+		obstacles = data.obstacles;
+
+		for(const ob of data.obstacles){
+			World.add(world, Bodies.circle(ob.x, ob.y, ob.r, data.OBSTACLE_OPTIONS));
+		}
+
 		World.add(world, playerBody);
 		ARENA_RADIUS = data.ARENA_RADIUS;
 
@@ -183,13 +195,13 @@ function setup() {
 		gameOverMsg = data.msg;
 
 		setTimeout(() => {
-			window.location.href = "./index.html"
+			window.location.href = "./index.nullhtml"
 		}, 5000);
 	});
 
 	socket.on("heartbeat", (data) => {
 
-		if (player != null) {
+		if (player != null && world != null) {
 			players.length = 0;
 			data.forEach((element) => {
 
@@ -266,7 +278,7 @@ function draw() {
 	if (state === gameState.PLAYING) {
 
 		screenDraw.drawGame(playerBody.position.x, playerBody.position.y, getScale(), ARENA_RADIUS, GRID_SIZE);
-
+		screenDraw.drawObstacles(obstacles);	
 
 		let x = mouseX;
 		let y = mouseY;

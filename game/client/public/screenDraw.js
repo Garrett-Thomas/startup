@@ -1,19 +1,19 @@
 class screenDraw {
 
 
-static _constrainStart(startPoint) {
-	if (startPoint < 0) return 0;
-	else {
-		return startPoint;
+	static _constrainStart(startPoint) {
+		if (startPoint < 0) return 0;
+		else {
+			return startPoint;
+		}
 	}
-}
 
-static _constrainEnd(endPoint, arenaSize, gridSize) {
-	if (endPoint > arenaSize / gridSize) return arenaSize / gridSize;
-	else {
-		return endPoint;
+	static _constrainEnd(endPoint, arenaSize, gridSize) {
+		if (endPoint > arenaSize / gridSize) return arenaSize / gridSize;
+		else {
+			return endPoint;
+		}
 	}
-}
 	static drawWaitScreen(playerX, playerY) {
 		push();
 
@@ -40,7 +40,7 @@ static _constrainEnd(endPoint, arenaSize, gridSize) {
 	}
 
 
-	static drawGameOver(msg){
+	static drawGameOver(msg) {
 
 		push();
 		background(200);
@@ -54,11 +54,19 @@ static _constrainEnd(endPoint, arenaSize, gridSize) {
 
 
 	}
-	static getScale(radius){
+	static getScale(radius) {
 		return 10 / radius
 	}
+	static drawObstacles(obstacles) {
 
-	static drawGame(playerX, playerY, scle, arenaSize, gridSize){
+		push();
+		for (const ob of obstacles) {
+			fill(122, 122, 0);
+			circle(ob.x, ob.y, ob.r * 2);
+		}
+		pop();
+	}
+	static drawGame(playerX, playerY, scle, arenaSize, gridSize) {
 		background(30, 30, 30);
 
 		translate(width / 2, height / 2);
@@ -103,30 +111,30 @@ static _constrainEnd(endPoint, arenaSize, gridSize) {
 		// 		rect(j * gridSize, i * gridSize, gridSize, gridSize);
 		// 	}
 
-		for(var i = 1; i < 10; i++){
+		for (var i = 1; i < 10; i++) {
 			circle(startX + endX / 2, startY + endY / 2, (arenaSize * 2) / i);
 		}
 
 		pop();
 	}
 
-	static drawBoostGauge(playerX, playerY, scale){
+	static drawBoostGauge(playerX, playerY, scale) {
 
-	push();
+		push();
 
-	let c = color(102, 255, 0);
+		let c = color(102, 255, 0);
 
-	// ALlows for transparency
-	c.setAlpha(126);
-	fill(c);
+		// ALlows for transparency
+		c.setAlpha(126);
+		fill(c);
 
-	let boostW = (((BOOST_TIME - elapsedTime) / BOOST_TIME) * 100) / scale;
-	let boostH = 50 / scale;
-	let x = playerX - (width / 2 - 5) / scale;
-	let y = playerY + (height / 2 - 55) / scale;
+		let boostW = (((BOOST_TIME - elapsedTime) / BOOST_TIME) * 100) / scale;
+		let boostH = 50 / scale;
+		let x = playerX - (width / 2 - 5) / scale;
+		let y = playerY + (height / 2 - 55) / scale;
 
-	rect(x, y, boostW, boostH);
-	pop();
+		rect(x, y, boostW, boostH);
+		pop();
 
 	}
 
@@ -143,18 +151,18 @@ static _constrainEnd(endPoint, arenaSize, gridSize) {
 		pop();
 	}
 
-	static drawFPS(playerX, playerY, scale){
-			textSize(DEFAULT_TEXT_SIZE / scale);
-			push();
-			fill(102, 255, 0);
-		
-			text(
-				Math.round(frameRate()),
-				playerX - (width / 2 - 10) / scale,
-				playerY - (height / 2 - 30) / scale 
-			);
-		
-			pop();
+	static drawFPS(playerX, playerY, scale) {
+		textSize(DEFAULT_TEXT_SIZE / scale);
+		push();
+		fill(102, 255, 0);
+
+		text(
+			Math.round(frameRate()),
+			playerX - (width / 2 - 10) / scale,
+			playerY - (height / 2 - 30) / scale
+		);
+
+		pop();
 	}
 }
 
