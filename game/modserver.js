@@ -8,7 +8,9 @@ import pkg from 'matter-js';
 const { Engine, Bodies, Body, World, Matter } = pkg;
 import { v4 as uuidv4 } from 'uuid';
 import cors from 'cors';
-import {getLeaderboard, registerUser} from './routes.js';
+import leaderBoardRoute from './routes/leaderboard.js';
+import authRoute from './routes/auth.js';
+// import {getLeaderboard, registerUser} from './routes/dbUtils.js';
 
 // import fs from 'fs';
 /*
@@ -419,47 +421,21 @@ io.on("connection", (socket) => {
 
 // app.use(dbMiddle);
 
-const apiRouter = express.Router();
+// const apiRouter = express.Router();
 
 app.use(express.json());
 
-app.use('/api', apiRouter);
-apiRouter.get("/leaderboard", async (req, res) => {
-
-    const data = await getLeaderboard();
-    res.json(data);
-
-});
-
-apiRouter.post('/register', async (req, res) => {
-
-    const data = req.body;
+// app.use('/api', apiRouter);
 
 
 
-    if (data.name.length < 3 || data.name.length > 20 || data.email.length < 3 || data.email.length > 30 || data.password_one.length < 3 || data.password_one.length > 20 || data.password_two.length < 3 || data.password_two.length > 20 || data.password_one !== data.password_two) {
 
-    return  res.status(400).json({ msg: "bad input" });
-
-    }
-
-    try{
-    await registerUser(data.name, data.email, data.password_one);
-
-    console.log(`Registered new user: ${data}`);
-    return res.json({msg: `Welcome ${data.name}`});
-
-    }
-    catch(err){
-        return res.status(500).json({msg: "Server Error"});
-        console.error(err);
-    }
-});
+app.use('/api/leaderboard', leaderBoardRoute);
 
 
 
-// app.use(leaderboardController);
 
+app.use('/api/', authRoute );
 
 server.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);

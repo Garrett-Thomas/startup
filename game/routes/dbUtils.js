@@ -2,7 +2,8 @@ import { MongoClient, ServerApiVersion } from 'mongodb';
 import fs from 'fs';
 import bcyrpt from 'bcrypt';
 
-const AUTH_STRING = fs.readFileSync('./secret/db.txt', 'utf-8').trim();
+const AUTH_STRING = fs.readFileSync('.secret/db.txt', 'utf-8').trim();
+
 
 const client = new MongoClient(AUTH_STRING, {
     serverApi: {
@@ -37,6 +38,14 @@ function getLeaderboard(){
 }
 
 async function registerUser(name, email, password){
+
+    const existingUser = await userCollection.findOne({email});
+
+    if(existingUser != null){
+        let err = new Error("User already exists");
+        err.cause = "duplicate";
+        throw err;
+    }
 
     const passwdHash = await bcyrpt.hash(password, 10);
 

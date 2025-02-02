@@ -1,10 +1,20 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { useNavigate } from 'react-router-dom';
-import React, { useState } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
 
 
 function Register() {
+
+
+    const notify = () => Object.values(formErrors).map((msg) => {
+
+        if (msg !== '') return toast(msg);
+
+
+
+    });
 
     const [formData, setFormData] = useState({
         name: '',
@@ -12,23 +22,25 @@ function Register() {
         password_one: '',
         password_two: '',
     });
+
     const [formErrors, setFormErrors] = useState({});
 
+    useEffect(() => {
+
+        Object.values(formErrors).map((msg) => msg !== '' ? toast(msg) : null);
+    }, [formErrors]);
 
     const handleChange = (e) => {
 
         setFormData({ ...formData, [e.target.name]: e.target.value });
-        setFormErrors({ ...formErrors, [e.target.name]: '' });
 
-        console.log(formData);
     }
 
 
 
 
     const validateForm = (form) => {
-        const errors = {};
-
+        let errors = {};
         if (!form.name) {
             errors.name = "Name is required";
         }
@@ -37,16 +49,12 @@ function Register() {
             errors.email = "Email is required";
         }
 
-        if (!form.password_one) {
+        if (!form.password_one || !form.password_two) {
             errors.password_one = "Password is required";
         }
 
-        if (!form.password_two) {
-            errors.password_two = "Password is required";
-        }
-
         if (form.password_one !== form.password_two) {
-            errors.match = "Passwords must match";
+            errors.password_two = "Passwords must match";
         }
 
         return errors;
@@ -61,15 +69,16 @@ function Register() {
         const errors = validateForm(formData);
         setFormErrors(errors);
 
-
         if (Object.keys(errors).length > 0) {
+
+            // notify();
             return;
         }
-        
-        try{
+
+        try {
             const response = await fetch('http://localhost:4000/api/register', {
                 method: 'POST',
-                headers:{
+                headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(formData),
@@ -77,17 +86,20 @@ function Register() {
             });
 
 
-            if(!response.ok){
+            if (!response.ok) {
+                debugger;
                 const errorData = await response.json();
-                throw new Error(errorData.message || "Server error");
+                let err = new Error(errorData.msg);
+                throw err;
             }
-            console.log('Success');
 
         }
-        catch(error){
+        catch (error) {
             console.error(`Error on registering: ${error}`);
+            setFormErrors({ ...formErrors, msg: error.message });
 
-            setFormErrors({...formErrors, general:error.message});
+            console.log(formErrors, error.message);
+            // notify();
         }
 
 
@@ -97,6 +109,7 @@ function Register() {
     return (
         <div>
             <Header />
+            <ToastContainer />
             <div className="row justify-content-center align-items-start  gradient-auth vh-90 w-100 m-0">
 
                 <form onSubmit={handleSubmit} className="max-width-login card bg-dark text-white mt-5">
@@ -110,26 +123,26 @@ function Register() {
 
 
                         <label htmlFor="name" className="form-label">Name</label>
-                        <input type="text" className="form-control" maxLength="20" name="name" onChange={handleChange} placeholder="Enter Name" />
+                        <input type="text" required={true} minLength="1" className="form-control" maxLength="20" name="name" onChange={handleChange} placeholder="Enter Name" />
 
                     </div>
                     <div className="form-group p-2">
 
 
                         <label htmlFor="email" className="form-label">Email Address</label>
-                        <input type="email" className="form-control" name="email" onChange={handleChange} aria-describedby="emailHelp" placeholder="Enter email" />
+                        <input type="email" required={true} pattern="[^@\s]+@[^@\s]+\.[^@\s]+" className="form-control" name="email" onChange={handleChange} autoComplete="off" placeholder="Enter email" />
 
                     </div>
 
                     <div className="form-group p-2">
 
                         <label htmlFor="password" className="form-label">Password</label>
-                        <input type="password" className="form-control" maxLength="20" name="password_one" onChange={handleChange} placeholder="Password" />
+                        <input type="password" required={true} className="form-control" minLength="6" maxLength="20" name="password_one" onChange={handleChange} placeholder="Password" />
                     </div>
                     <div className="form-group p-2">
 
                         <label htmlFor="password" className="form-label">Password Again</label>
-                        <input type="password" className="form-control" maxLength="20" name="password_two" onChange={handleChange} placeholder="Password" />
+                        <input type="password" required={true} className="form-control" minLength="6" maxLength="20" name="password_two" onChange={handleChange} placeholder="Password" />
                     </div>
                     <div className="row ">
                         <div className="col-5 p-5 align-items-center text-center w-100">
