@@ -3,13 +3,14 @@ const app = express();
 import http from 'http';
 const server = http.createServer(app);
 import { Server } from 'socket.io'
+
 import pkg from 'matter-js';
 const { Engine, Bodies, Body, World, Matter } = pkg;
 import { v4 as uuidv4 } from 'uuid';
 import cors from 'cors';
-import fs from 'fs';
-import {MongoClient, ServerApiVersion} from 'mongodb';
-import leaderboardController from './routes/leaderboard.js';
+import {getLeaderboard, registerUser} from './routes.js';
+
+// import fs from 'fs';
 /*
 Have a map structure that maps the "Game-ID" to the two players + physics engine
 Better experience only two players to a game.
@@ -23,6 +24,7 @@ const io = new Server(server, {
         origin: "*",
     },
 });
+
 app.use(cors());
 
 const PORT = 4000 || process.env.PORT;
@@ -32,17 +34,17 @@ const DEFAULT_RADIUS = 50;
 const PLAYER_TIMEOUT = 100;
 const OBSTACLE_RADIUS = 200;
 
-const AUTH_STRING = fs.readFileSync('.secret/db.txt', 'utf-8').trim();
-const client = new MongoClient(AUTH_STRING, {
-    serverApi: {
-      version: ServerApiVersion.v1,
-      strict: true,
-      deprecationErrors: true,
-    }
-  });
+// const AUTH_STRING = fs.readFileSync('.secret/db.txt', 'utf-8').trim();
+// const client = new MongoClient(AUTH_STRING, {
+//     serverApi: {
+//       version: ServerApiVersion.v1,
+//       strict: true,
+//       deprecationErrors: true,
+//     }
+//   });
 
-await client.connect();
-await client.db("startup").command({ping: 1});
+// await client.connect();
+// await client.db("startup").command({ping: 1});
 
 const gameStatus = {
     WAITING: "waiting",
@@ -284,7 +286,7 @@ function makeWinners(winners) {
 
 
 }
-function getMagnitude(x, y){
+function getMagnitude(x, y) {
     return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 }
 
@@ -372,7 +374,7 @@ function heartbeat() {
 
         value.players.forEach((player) => {
 
-            idToSocket.get(player.socketId).emit('heartbeat', {players: value.players, timing: value.engine.timing});
+            idToSocket.get(player.socketId).emit('heartbeat', { players: value.players, timing: value.engine.timing });
         });
     });
 
@@ -410,13 +412,53 @@ io.on("connection", (socket) => {
 
     console.log(`Player joined: ${socket.id}`);
 });
-function dbMiddle(req, res, next){
-    req.db = client.db('startup');
-    next();
-}
+// function dbMiddle(req, res, next){
+//     req.db = client.db('startup');
+//     next();
+// }
 
-app.use(dbMiddle);
-app.use(leaderboardController);
+// app.use(dbMiddle);
+
+const apiRouter = express.Router();
+
+app.use(express.json());
+
+app.use('/api', apiRouter);
+apiRouter.get("/leaderboard", async (req, res) => {
+
+    const data = await getLeaderboard();
+    res.json(data);
+
+});
+
+apiRouter.post('/register', async (req, res) => {
+
+    const data = req.body;
+
+
+
+    if (data.name.length < 3 || data.name.length > 20 || data.email.length < 3 || data.email.length > 30 || data.password_one.length < 3 || data.password_one.length > 20 || data.password_two.length < 3 || data.password_two.length > 20 || data.password_one !== data.password_two) {
+
+    return  res.status(400).json({ msg: "bad input" });
+
+    }
+
+    try{
+    await registerUser(data.name, data.email, data.password_one);
+
+    console.log(`Registered new user: ${data}`);
+    return res.json({msg: `Welcome ${data.name}`});
+
+    }
+    catch(err){
+        return res.status(500).json({msg: "Server Error"});
+        console.error(err);
+    }
+});
+
+
+
+// app.use(leaderboardController);
 
 
 server.listen(PORT, () => {
