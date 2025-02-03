@@ -113,7 +113,7 @@ function Register() {
 
 
                         <label htmlFor="name" className="form-label">Name</label>
-                        <input type="text" required={true} minLength="1" className="form-control" maxLength="20" name="name" onChange={handleChange} placeholder="Enter Name" />
+                        <input type="text" required={true} minLength="1" className="form-control" maxLength="20" name="name" onChange={handleChange} placeholder="Enter First Name (One Word)" />
 
                     </div>
                     <div className="form-group p-2">

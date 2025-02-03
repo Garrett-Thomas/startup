@@ -45,7 +45,20 @@ return jwt.sign(payload, jwtSecret, {expiresIn: 3600});
 
 }
 
+async function loginUser(email, password){
 
+const user = await userCollection.findOne({email: email});
+// const passwdHash = await bcyrpt.hash(password, 10);
+
+
+const areSamePassword = await bcyrpt.compare(password, user.password);
+if(user == null || !areSamePassword) return null;
+
+
+return user;
+
+
+}
 
 async function getUserIdByEmail(email){
     return await userCollection.findOne({email: email});
@@ -73,9 +86,9 @@ async function registerUser(name, email, password){
     };
 
 
-return await userCollection.insertOne(user);
-
+await userCollection.insertOne(user);
+return user;
 }
 
 
-export {getLeaderboard, registerUser, generateJWT, getUserIdByEmail};
+export {getLeaderboard, registerUser, generateJWT, loginUser};

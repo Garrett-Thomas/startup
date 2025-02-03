@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { check, body, validationResult } from 'express-validator';
-import {registerUser, generateJWT, getUserIdByEmail} from './dbUtils.js';
+import { registerUser, generateJWT, loginUser } from './dbUtils.js';
 
 
 
@@ -19,16 +19,13 @@ check('password_two', "Passwords must match").custom((password_two, { req }) => 
 
         // Client does same error checking so I only need to say invalid input 
         // This makes it easier to display this as a notification
-        if(!errors.isEmpty()) return res.status(400).json({msg:"Invalid Input"});
+        if (!errors.isEmpty()) return res.status(400).json({ msg: "Invalid Input" });
 
 
         try {
-            await registerUser(req.body.name, req.body.email, req.body.password_one);
+            const user = await registerUser(req.body.name, req.body.email, req.body.password_one);
 
-            // const id = (await getUserIdByEmail(req.body.email))._id;
-
-            // console.log(id);
-            return res.json({ msg: `Welcome ${req.body.name}`, token: generateJWT({email: req.body.email})});
+            return res.json({ msg: `Welcome ${req.body.name}`, token: generateJWT(user) });
 
         }
         catch (err) {
@@ -40,5 +37,30 @@ check('password_two', "Passwords must match").custom((password_two, { req }) => 
         }
     });
 
+
+router.post('/login', [check('email', 'Email is required').isEmail().notEmpty(),
+check('password', 'Password is required').notEmpty()], async (req, res) => {
+
+const errors = validationResult(req);
+
+    if (!errors.isEmpty()) return res.status(400).json({ msg: "Invalid Input" });
+
+    try{
+
+        const user = await loginUser(req.body.email, req.body.password);
+
+        if(user == null){
+            return res.status(400).json({msg:"Invalid Credentials"});
+        }
+
+        return res.json({ msg: `Login Successful`, name: user.name, token: generateJWT({ email: req.body.email }) });
+
+    }
+    catch(err){
+        return res.status(500).json({msg: err.message});
+    }
+
+
+})
 
 export default router;
