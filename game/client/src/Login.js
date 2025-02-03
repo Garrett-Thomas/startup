@@ -18,7 +18,6 @@ function Login() {
 
 
     useEffect(() => {
-        debugger;
         Object.values(formErrors).map((msg) => msg !== '' ? toast(msg) : null);
     }, [formErrors]);
 
@@ -71,8 +70,8 @@ function Login() {
                 let err = new Error(data.msg);
                 throw err;
             }
-
-            login(data.jwt);
+            debugger;
+            login(data.token);
             setName(data.name);
             navigate('/');
         }

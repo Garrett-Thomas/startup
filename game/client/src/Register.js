@@ -76,13 +76,12 @@ function Register() {
 
 
             if (!response.ok) {
-                debugger;
                 const errorData = await response.json();
                 let err = new Error(errorData.msg);
                 throw err;
             }
 
-            login(response.json().jwt);
+            login(response.json().token);
             setName(formData.name);
             navigate('/');
         }

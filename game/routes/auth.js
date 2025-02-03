@@ -6,7 +6,7 @@ import { registerUser, generateJWT, loginUser } from './dbUtils.js';
 
 
 
-router.post('/register', [check('name', 'Name is required').isAlpha().notEmpty().isLength({ max: 20 }),
+router.post('/register', [check('name', 'Only one word names are allowed').isAlpha().notEmpty().isLength({ max: 20 }),
 check('email', 'Email is required').isEmail().notEmpty().isLength({ min: 2, max: 30 }),
 check('password_one', 'Please enter a password with 6 or more characters').isLength({ min: 6 }),
 check('password_two', "Passwords must match").custom((password_two, { req }) => password_two == req.body.password_one),
@@ -19,7 +19,8 @@ check('password_two', "Passwords must match").custom((password_two, { req }) => 
 
         // Client does same error checking so I only need to say invalid input 
         // This makes it easier to display this as a notification
-        if (!errors.isEmpty()) return res.status(400).json({ msg: "Invalid Input" });
+
+        if (!errors.isEmpty()) return res.status(400).json({ msg: errors.array().pop().msg});
 
 
         try {
@@ -53,7 +54,7 @@ const errors = validationResult(req);
             return res.status(400).json({msg:"Invalid Credentials"});
         }
 
-        return res.json({ msg: `Login Successful`, name: user.name, token: generateJWT({ email: req.body.email }) });
+        return res.json({ msg: `Login Successful`, name: user.name, token: generateJWT(user) });
 
     }
     catch(err){
