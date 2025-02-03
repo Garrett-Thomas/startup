@@ -2,20 +2,13 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import React, { useState, useEffect } from "react";
-
+import React, { useState, useEffect, useContext} from "react";
+import {AuthContext} from './context/auth';
 
 function Register() {
 
-
-    const notify = () => Object.values(formErrors).map((msg) => {
-
-        if (msg !== '') return toast(msg);
-
-
-
-    });
-
+    const {login, setName} = useContext(AuthContext);
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -69,11 +62,7 @@ function Register() {
         const errors = validateForm(formData);
         setFormErrors(errors);
 
-        if (Object.keys(errors).length > 0) {
-
-            // notify();
-            return;
-        }
+        if (Object.keys(errors).length > 0) return;
 
         try {
             const response = await fetch('http://localhost:4000/api/register', {
@@ -93,13 +82,14 @@ function Register() {
                 throw err;
             }
 
+            login(response.json().jwt);
+            setName(formData.name);
+            navigate('/');
         }
         catch (error) {
             console.error(`Error on registering: ${error}`);
             setFormErrors({ ...formErrors, msg: error.message });
 
-            console.log(formErrors, error.message);
-            // notify();
         }
 
 

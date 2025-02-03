@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { check, body, validationResult } from 'express-validator';
-import {registerUser} from './dbUtils.js';
+import {registerUser, generateJWT, getUserIdByEmail} from './dbUtils.js';
 
 
 
@@ -25,8 +25,10 @@ check('password_two', "Passwords must match").custom((password_two, { req }) => 
         try {
             await registerUser(req.body.name, req.body.email, req.body.password_one);
 
-            console.log(`Registered new user: ${req.body.name}`);
-            return res.json({ msg: `Welcome ${req.body.name}` });
+            // const id = (await getUserIdByEmail(req.body.email))._id;
+
+            // console.log(id);
+            return res.json({ msg: `Welcome ${req.body.name}`, token: generateJWT({email: req.body.email})});
 
         }
         catch (err) {

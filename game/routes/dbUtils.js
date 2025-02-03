@@ -1,11 +1,11 @@
 import { MongoClient, ServerApiVersion } from 'mongodb';
 import fs from 'fs';
 import bcyrpt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-const AUTH_STRING = fs.readFileSync('.secret/db.txt', 'utf-8').trim();
+const {mongoURI, jwtSecret} = JSON.parse(fs.readFileSync('.secret/db.json', 'utf-8'));
 
-
-const client = new MongoClient(AUTH_STRING, {
+const client = new MongoClient(mongoURI, {
     serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
@@ -37,6 +37,21 @@ function getLeaderboard(){
     return allUsers;
 }
 
+
+function generateJWT(payload){
+
+
+return jwt.sign(payload, jwtSecret, {expiresIn: 3600});
+
+}
+
+
+
+async function getUserIdByEmail(email){
+    return await userCollection.findOne({email: email});
+
+}
+
 async function registerUser(name, email, password){
 
     const existingUser = await userCollection.findOne({email});
@@ -63,4 +78,4 @@ return await userCollection.insertOne(user);
 }
 
 
-export {getLeaderboard, registerUser};
+export {getLeaderboard, registerUser, generateJWT, getUserIdByEmail};

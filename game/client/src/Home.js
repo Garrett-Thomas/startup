@@ -1,8 +1,12 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import React, { useState } from "react";
+import {AuthContext} from "./context/auth";
+
+import React, { useState, useContext} from "react";
 
 function Home() {
+
+	const {accountName} = useContext(AuthContext);
 	const [gameData, setGameData] = useState({
 		playerName: localStorage.getItem("playerName") || "unnamed",
 	});
@@ -42,7 +46,7 @@ function Home() {
 						<div class="row text-center mb-3">
 
 							<div class="col p-2">
-								<h3>Welcome Player 🇺🇸</h3>
+								<h3>Welcome {accountName} 🇺🇸</h3>
 							</div>
 						</div>
 
