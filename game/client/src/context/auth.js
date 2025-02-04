@@ -7,7 +7,7 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [accountName, setAccountName] = useState("Player");
-  const [isAuthenticated, setAuthenticated] = useState(false);
+  const [isAuthenticated, setAuthenticated] = useState(localStorage.getItem('isAuthenticated') === true || false);
 
 
   const fetchAccountName = async () => {
@@ -37,7 +37,6 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check for token in local storage on component mount
     const storedToken = localStorage.getItem('token');
-debugger;
     if (storedToken) {
       console.log(storedToken);
       const decoded = jwtDecode(storedToken);
@@ -45,6 +44,7 @@ debugger;
       if (decoded.exp < Date.now()) {
         setAuthenticated(true);
         setToken(storedToken);
+        localStorage.setItem('isAuthenticated', true);
       }
     }
 
@@ -64,13 +64,16 @@ debugger;
     console.log(newToken);
     localStorage.setItem('token', newToken);
     setAuthenticated(true);
+    localStorage.setItem('isAuthenticated', true);
     setToken(newToken);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('isAuthenticated');
     setAuthenticated(false);
     setToken(null);
+    setAccountName("Player");
   };
 
   const setName = (name) => (setAccountName(name));

@@ -45,6 +45,15 @@ return jwt.sign(payload, jwtSecret, {expiresIn: 3600});
 
 }
 
+
+
+
+async function getUserByEmail(email){
+
+
+    return await userCollection.findOne({email: email});
+}
+
 async function loginUser(email, password){
 
 const user = await userCollection.findOne({email: email});
@@ -59,11 +68,11 @@ return user;
 
 
 }
+function verifyAndDecodeToken(token, secretKey) {
 
-async function getUserIdByEmail(email){
-    return await userCollection.findOne({email: email});
-
-}
+      const decoded = jwt.verify(token, jwtSecret); // Verify the token
+      return decoded; // If verification is successful, return the decoded payload
+  }
 
 async function registerUser(name, email, password){
 
@@ -91,4 +100,4 @@ return user;
 }
 
 
-export {getLeaderboard, registerUser, generateJWT, loginUser};
+export {getLeaderboard, registerUser, generateJWT, loginUser, verifyAndDecodeToken, getUserByEmail};

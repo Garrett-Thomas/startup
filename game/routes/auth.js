@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import { check, body, validationResult } from 'express-validator';
-import { registerUser, generateJWT, loginUser } from './dbUtils.js';
+import { registerUser, generateJWT, loginUser, verifyAndDecodeToken, getUserByEmail } from './dbUtils.js';
 
 
 
@@ -20,7 +20,7 @@ check('password_two', "Passwords must match").custom((password_two, { req }) => 
         // Client does same error checking so I only need to say invalid input 
         // This makes it easier to display this as a notification
 
-        if (!errors.isEmpty()) return res.status(400).json({ msg: errors.array().pop().msg});
+        if (!errors.isEmpty()) return res.status(400).json({ msg: errors.array().pop().msg });
 
 
         try {
@@ -42,26 +42,57 @@ check('password_two', "Passwords must match").custom((password_two, { req }) => 
 router.post('/login', [check('email', 'Email is required').isEmail().notEmpty(),
 check('password', 'Password is required').notEmpty()], async (req, res) => {
 
-const errors = validationResult(req);
+    const errors = validationResult(req);
 
     if (!errors.isEmpty()) return res.status(400).json({ msg: "Invalid Input" });
 
-    try{
+    try {
 
         const user = await loginUser(req.body.email, req.body.password);
 
-        if(user == null){
-            return res.status(400).json({msg:"Invalid Credentials"});
+        if (user == null) {
+            return res.status(400).json({ msg: "Invalid Credentials" });
         }
 
         return res.json({ msg: `Login Successful`, name: user.name, token: generateJWT(user) });
 
     }
-    catch(err){
-        return res.status(500).json({msg: err.message});
+    catch (err) {
+        return res.status(500).json({ msg: err.message });
     }
 
 
-})
+});
+
+
+
+
+router.get('/user-data', [check('token', 'JWT is required').notEmpty()], async (req, res) => {
+
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) return res.status(400).json({ msg: errors.array().pop() });
+
+    try {
+
+        const token = verifyAndDecodeToken(req.headers.token);
+
+
+        const user = await getUserByEmail(token.email);
+
+        return res.json({ user });
+
+
+
+    }
+    catch (err) {
+        console.error(err);
+        return res.status(500).json({ msg: err.message });
+    }
+
+
+});
+
+
 
 export default router;

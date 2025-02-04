@@ -4,7 +4,8 @@ import { AuthContext } from "../context/auth";
 
 function Header() {
 
-    const { isAuthenticated } = useContext(AuthContext);
+    const { logout, isAuthenticated } = useContext(AuthContext);
+
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid p-2">
@@ -15,7 +16,19 @@ function Header() {
                 </button>
                 <div className="collapse navbar-collapse" id="navbarToggler">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                        {isAuthenticated ? <></> :
+                        {isAuthenticated ? <>
+                            <li className="nav-item m-2 ">
+                                <button className="btn btn-danger col" onClick={logout} >Logout</button>
+                            </li>
+
+                            <li className="nav-item m-2">
+                                <Link className="btn btn-outline-secondary col" to="/stats">Stats</Link>
+                            </li>
+
+
+
+
+                        </> :
 
                             <>
                                 <li className="nav-item m-2 ">
