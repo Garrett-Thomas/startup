@@ -52,3 +52,13 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Login placeholder** - Placeholder for auth on the login page.
 - [x] **DB data placeholder** - High scores displayed on leaderboard page.
 - [x] **WebSocket placeholder** - The game page has an image of what the game will look like. Game communication done through websockets
+
+
+## 🚀 CSS deliverable
+
+- [x] **Header, footer, and main content body** - I used a common CSS file to style these `style.css` along with the bootstrap style sheet. 
+- [x] **Navigation elements** - Bootstrap NavBar.
+- [x] **Responsive to window resizing** - Bootstrap and `display:flex' did most the work here. I'm really happy with the game rendering.
+- [x] **Application elements** - I used a lot of bootstrap grid
+- [x] **Application text content** - I used bootstrap fonts and it looks dope.
+- [x] **Application images** - I used an SVG image of the github logo as my link to my repo
