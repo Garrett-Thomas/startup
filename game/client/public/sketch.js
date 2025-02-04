@@ -184,7 +184,7 @@ function setup() {
 		gameOverMsg = data.msg;
 		clearInterval(gameStartTimerId);
 		setTimeout(() => {
-			window.location.href = "./index.html"
+			window.location.href = "/"
 		}, 5000);
 
 	})
@@ -194,7 +194,7 @@ function setup() {
 		gameOverMsg = data.msg;
 
 		setTimeout(() => {
-			window.location.href = "./index.nullhtml"
+			window.location.href = "/"
 		}, 5000);
 	});
 
@@ -235,9 +235,9 @@ function setup() {
 	});
 
 	let name = localStorage.getItem("playerName");
-
-	if (name == null) {
-		window.location.href = "./index.html";
+	debugger;
+	if (name == null || name.length > 20) {
+		window.location.href = "/";
 		
 	}
 	else{

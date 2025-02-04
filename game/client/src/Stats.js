@@ -1,53 +1,76 @@
 import Header from './components/Header';
 import Footer from './components/Footer';
-import { ToastContainer, toast } from 'react-toastify';
 import { AuthContext } from './context/auth';
-import React, { useContext, useEffect, useState} from 'react';
-
-
+import React, { useContext, useEffect, useState } from 'react';
+import Loading from './components/Loading';
+import Error from './components/Error';
 
 // Should be served by an api call
 function Stats() {
 
-    const {token} = useContext(AuthContext);
+    const { token } = useContext(AuthContext);
     const [stats, setStats] = useState({});
-    const [loaded, setLoaded] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
-    useEffect(()=>{
-        async function getUserData(){
+    useEffect(() => {
+        async function getUserData() {
 
-            if(!token) return;
-        try{
-        const response = await fetch('http://localhost:4000/api/user-data', {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-              'token': token
-            },
-    
-          });
-          if(!response.ok) throw new Error();
+            if (!token) return;
+            try {
+                const response = await fetch('http://localhost:4000/api/user-data', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'token': token
+                    },
 
-          const data = await response.json();
-          console.log(data.user);
-          setStats(data.user);
-          setLoaded(true);
-        }
-        catch(err){
+                });
+                if (!response.ok) throw new Error();
 
-        toast("Could not retrieve user data"); 
-        }
+                const data = await response.json();
+                
+                setStats(data.user);
+                setLoading(false);
+            }
+            catch (err) {
+                setLoading(false);
+                setError(true)
+            }
 
 
         }
         getUserData();
 
-    },[token]);
+    }, [token]);
 
+    if (loading) {
+        return (
+            <div>
+            <Header/>
+            <div className="row  align-items-start gradient-leaderboard vh-90 w-100 m-0">
+                <Loading loadingText="Loading Your Stats..." />
+            </div>
+            <Footer/>
+</div>
+        )
+    }
+    else if(error){
+        return (
+            <div>
+            <Header/>
+            <div className="row  align-items-start gradient-leaderboard vh-90 w-100 m-0">
+                <Error errorText ="An Error Occurred While Loading Your Stats..." />
+            </div>
+            <Footer/>
+</div>
+        )
+
+
+    }
     return (
         <div>
             <Header />
-            <ToastContainer/>
             <div className="row  align-items-start gradient-leaderboard vh-90 w-100 m-0">
                 <div className=" max-min-width-leaderboard container text-center card mt-5">
                     <div className="row row-cols-3 row-cols-lg-3 gx-3 g-lg-3 ">
@@ -72,25 +95,25 @@ function Stats() {
                                 <p className="w-100 text-dark border-bottom border-dark border-3"># of Games Won</p>
                             </div>
                         </div>
-                        {loaded ? 
-                        <>
-                       <div className="col">
+                        {!loading ?
+                            <>
+                                <div className="col">
 
-                       <p className="text-primary">{stats.name}</p>
-               </div>
+                                    <p className="text-primary">{stats.name}</p>
+                                </div>
 
-               <div className="col">
+                                <div className="col">
 
-                       <p className="text-dark">{stats.gamesPlayed}</p>
-               </div>
+                                    <p className="text-dark">{stats.gamesPlayed}</p>
+                                </div>
 
-               <div className="col">
+                                <div className="col">
 
-                       <p className="text-dark">{stats.gamesWon}</p>
-               </div>
-                        </>
+                                    <p className="text-dark">{stats.gamesWon}</p>
+                                </div>
+                            </>
 
-                        : <></>}
+                            : <></>}
                     </div>
                 </div>
             </div>

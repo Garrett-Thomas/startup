@@ -16,7 +16,7 @@ const AuthContext = createContext({});
 
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
-  const [accountName, setAccountName] = useState("Player");
+  const [accountName, setAccountName] = useState(localStorage.getItem("accountName") || "Player");
   const [isAuthenticated, setAuthenticated] = useState(null);
 
   useEffect(() => {
@@ -28,6 +28,7 @@ const AuthProvider = ({ children }) => {
       if (decoded.exp > Math.floor(Date.now() / 1000)) {
         setAuthenticated(true);
         setToken(storedToken);
+        localStorage.setItem("accountName", jwtDecode(token).name);
         localStorage.setItem('isAuthenticated', true);
       }
       else {
@@ -41,17 +42,12 @@ const AuthProvider = ({ children }) => {
       logout();
     }
 
-    const storedAccName = localStorage.getItem('accountName');
-
-    if (storedAccName) {
-      setToken(storedAccName);
-    }
-
 
   }, []);
 
   const login = (newToken) => {
     console.log(newToken);
+    localStorage.setItem('accountName', jwtDecode(newToken).name);
     localStorage.setItem('token', newToken);
     setAuthenticated(true);
     localStorage.setItem('isAuthenticated', true);

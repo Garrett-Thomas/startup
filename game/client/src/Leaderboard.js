@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import Footer from "./components/Footer";
 
 import Header from "./components/Header";
+import Loading from "./components/Loading";
+import Error from "./components/Error";
 
 function Leaderboard() {
 
 
     const [leaderboardData, setLeaderBoardData] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState(false);
 
     useEffect(() => {
 
@@ -20,38 +22,40 @@ function Leaderboard() {
                 const data = await response.json();
 
                 setLeaderBoardData(data);
+                setLoading(false);
             }
             catch (err) {
-                setError(err);
-                console.error(err);
-            }
-            finally {
                 setLoading(false);
+                setError(true);
+                console.error(err);
             }
 
         }
         fetchLeaderboardData()
     }, []);
 
-    // Needs real api call
     if (loading) {
         return (
             <div>
                 <Header />
-                <h3>
-                    Loading Leaderboard...
-                </h3>
+
+                <div className="row  align-items-start gradient-leaderboard vh-90 w-100 m-0">
+                    <Loading loadingText="Loading Leaderboard..." />
+                </div>
                 <Footer />
-            </div>
+            </div >
         )
     }
     if (error) {
         return (
             <div>
-                <h3>
-                    Loading Leaderboard...
-                </h3>
+            <Header />
+
+            <div className="row  align-items-start gradient-leaderboard vh-90 w-100 m-0">
+                <Error errorText="Could not load Leaderboard" />
             </div>
+            <Footer />
+        </div >
         )
     }
 
@@ -87,17 +91,17 @@ function Leaderboard() {
                             <React.Fragment key={index}>
                                 <div className="col">
 
-                                        <p className="text-primary">{player.name}</p>
+                                    <p className="text-primary">{player.name}</p>
                                 </div>
 
                                 <div className="col">
 
-                                        <p className="text-dark">{player.gamesPlayed}</p>
+                                    <p className="text-dark">{player.gamesPlayed}</p>
                                 </div>
 
                                 <div className="col">
 
-                                        <p className="text-dark">{player.gamesWon}</p>
+                                    <p className="text-dark">{player.gamesWon}</p>
                                 </div>
                             </React.Fragment>
 
