@@ -13,7 +13,7 @@ function Login() {
 
     const [formData, setFormData] = useState({});
     const [formErrors, setFormErrors] = useState({});
-    const {login, setName} = useContext(AuthContext);
+    const {login, setAccountName} = useContext(AuthContext);
     const navigate = useNavigate();
 
 
@@ -70,9 +70,9 @@ function Login() {
                 let err = new Error(data.msg);
                 throw err;
             }
-            debugger;
+
             login(data.token);
-            setName(data.name);
+            setAccountName(data.name);
             navigate('/');
         }
         catch (error) {
