@@ -68,11 +68,28 @@ return user;
 
 
 }
-function verifyAndDecodeToken(token, secretKey) {
+function verifyAndDecodeToken(token) {
 
       const decoded = jwt.verify(token, jwtSecret); // Verify the token
       return decoded; // If verification is successful, return the decoded payload
   }
+
+
+function addGameWon(jwtToken){
+
+    const decoded = jwt.verify(jwtToken, jwtSecret);
+
+    const update = { $inc: {gamesWon: 1}};
+    userCollection.updateOne({email: decoded.email}, update);
+
+}
+
+function addGamePlayed(jwtToken){
+
+    const decoded = jwt.verify(jwtToken, jwtSecret);
+    const update = {$inc: {gamesPlayed: 1}}
+    userCollection.updateOne({email: decoded.email}, update);
+}
 
 async function registerUser(name, email, password){
 
@@ -100,4 +117,4 @@ return user;
 }
 
 
-export {getLeaderboard, registerUser, generateJWT, loginUser, verifyAndDecodeToken, getUserByEmail};
+export {getLeaderboard, registerUser, generateJWT, loginUser, verifyAndDecodeToken, getUserByEmail, addGamePlayed, addGameWon};

@@ -119,7 +119,7 @@ function getScale() {
 
 function sendPlayerData(name) {
 
-	socket.emit("join", { playerName: name, color: 0 });
+	socket.emit("join", { playerName: name, color: 0, token: localStorage.getItem('token') });
 }
 
 function getPlayerData() {

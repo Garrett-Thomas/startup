@@ -20,7 +20,7 @@ class Tank {
     update(vec) {
         this.direction.lerp(vec, 0.9);
         this.direction.limit(10);
-        this.direction.mult(0.016 * this.r);
+        this.direction.mult(0.6 * this.r);
     }
 
     draw() {

@@ -10,7 +10,9 @@ import { v4 as uuidv4 } from 'uuid';
 import cors from 'cors';
 import leaderBoardRoute from './routes/leaderboard.js';
 import authRoute from './routes/auth.js';
-// import {getLeaderboard, registerUser} from './routes/dbUtils.js';
+
+import {addGameWon, addGamePlayed} from './routes/dbUtils.js';
+
 
 // import fs from 'fs';
 /*
@@ -59,7 +61,7 @@ const spawnOptions = [[[-1, 0], [1, 0]], [[0, 1], [0, -1]]];
 
 const PLAYER_OPTIONS = {
     friction: 0,
-    density: 1,
+    density: 100,
     restitution: 0,
     frictionAir: 0,
     slop: -1
@@ -69,6 +71,7 @@ const OBSTACLE_OPTIONS = {
     isStatic: true,
     restitution: 0,
     friction: 0,
+    slop:-1,
 }
 
 const WORLD_OPTIONS = {
@@ -81,6 +84,7 @@ let gameIDToGame = new Map();
 let sockToGame = new Map();
 const socketLastSeen = new Map();
 const playerBodies = new Map();
+const idToToken = new Map();
 
 setInterval(() => {
     game();
@@ -225,7 +229,7 @@ function game() {
 
     let winners = heartbeat();
 
-    makeWinners(winners);
+    makeLosers(winners);
     deleteGames(winners);
     deleteSockets();
 
@@ -267,23 +271,37 @@ function deleteSockets() {
 
 }
 
-function makeWinners(winners) {
+function makeLosers(winners) {
 
-    for (const player of winners) {
+    for (const loser of winners) {
 
-        const gameId = player.gameId;
+        const gameId = loser.gameId;
         const game = gameIDToGame.get(gameId);
 
-        const loser = game.players.filter((loser) => loser.socketId != player.socketId)[0];
-
+        const winner = game.players.filter((player) => loser.socketId != player.socketId)[0];
+        const winnerToken = idToToken.get(winner.socketId);
+        const loserToken = idToToken.get(loser.socketId);
         if (loser != null) {
-            idToSocket.get(loser.socketId).emit('game_end', { msg: "loser" });
-            idToSocket.get(player.socketId).emit('game_end', { msg: "winner" });
+            idToSocket.get(loser.socketId).emit('game_end', { msg: "You Lost!" });
+            idToSocket.get(winner.socketId).emit('game_end', { msg: "You Won!" });
+
+            if(loserToken){
+            addGamePlayed(loserToken);
+            }
         }
 
         else {
-            idToSocket.get(player.socketId).emit('game_end', { msg: "Opponnent disconnected" });
+            idToSocket.get(winner.socketId).emit('game_end', { msg: "Opponnent disconnected" });
         }
+
+        if(winnerToken){
+
+            console.log(winnerToken);
+            addGameWon(winnerToken);
+            addGamePlayed(winnerToken);
+
+        }
+
     }
 
 
@@ -321,6 +339,7 @@ function deletePlayer(socketId) {
         socketLastSeen.delete(socketId);
         idToSocket.get(socketId).disconnect(true);
         idToSocket.delete(socketId);
+        idToToken.delete(socketId);
     }
     catch (err) {
 
@@ -333,7 +352,7 @@ function heartbeat() {
 
     // Iterate through each game object to step the physics engine and
     // send the client updated data
-    let winners = [];
+    let losers = [];
 
     gameIDToGame.forEach((value, key) => {
 
@@ -360,10 +379,10 @@ function heartbeat() {
             Engine.update(value.engine, HEARTBEAT_TIME);
             value.players.forEach((player) => {
 
-                // if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
-                //     value.status = gameStatus.WON;
-                //     winners.push(player);
-                // }
+                if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
+                    value.status = gameStatus.WON;
+                    losers.push(player);
+                }
 
                 const { x, y } = playerBodies.get(player.socketId).position;
                 player.x = x;
@@ -381,7 +400,7 @@ function heartbeat() {
     });
 
 
-    return winners;
+    return losers;
 
 }
 
@@ -407,6 +426,12 @@ io.on("connection", (socket) => {
 
 
     socket.once("join", (data) => {
+
+
+        // Easiest to make a new data structure to store this
+        if(data.token) {
+            idToToken.set(socket.id, data.token); 
+        }
         userSetup(socket, data.playerName, data.color);
     })
 
@@ -414,26 +439,11 @@ io.on("connection", (socket) => {
 
     console.log(`Player joined: ${socket.id}`);
 });
-// function dbMiddle(req, res, next){
-//     req.db = client.db('startup');
-//     next();
-// }
 
-// app.use(dbMiddle);
-
-// const apiRouter = express.Router();
 
 app.use(express.json());
 
-// app.use('/api', apiRouter);
-
-
-
-
 app.use('/api/leaderboard', leaderBoardRoute);
-
-
-
 
 app.use('/api/', authRoute );
 

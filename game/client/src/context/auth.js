@@ -18,8 +18,33 @@ const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
   const [accountName, setAccountName] = useState(localStorage.getItem("accountName") || "Player");
   const [isAuthenticated, setAuthenticated] = useState(null);
+  const [country, setCountry] = useState(null);
+
+
 
   useEffect(() => {
+
+async function getCountry() {
+
+			try {
+				const response = await fetch("https://api.country.is/");
+
+				if (!response.ok) return;
+				setCountry((await response.json()).country);
+			}
+			catch (err) {
+				console.error(err.message);
+			}
+
+
+		}
+		if(country == null){
+		getCountry();
+
+		}
+
+
+
     // Check for token in local storage on component mount
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
@@ -63,7 +88,7 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, setToken, accountName, setAccountName, isAuthenticated, setAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ token, setToken, accountName, setAccountName, isAuthenticated, setAuthenticated, login, logout, country }}>
       {children}
     </AuthContext.Provider>
   );

@@ -6,8 +6,7 @@ import React, { useState, useContext, useEffect } from "react";
 
 function Home() {
 
-	const { accountName } = useContext(AuthContext);
-	const [country, setCountry] = useState(null);
+	const { accountName, country } = useContext(AuthContext);
 
 	const [gameData, setGameData] = useState({
 		playerName: localStorage.getItem("playerName") || "unnamed",
@@ -27,14 +26,6 @@ function getFlagEmoji (countryCode) {
 	return String.fromCodePoint(...codePoints);
 }
 
-	function nameChanged(e) {
-		setGameData((prevData) => {
-			return { ...prevData, playerName: e.target.value };
-		});
-
-		localStorage.setItem("playerName", e.target.value);
-	}
-
 	function submit(e) {
 		if (
 			(e.code === "Enter" || e.type === "click") &&
@@ -42,34 +33,9 @@ function getFlagEmoji (countryCode) {
 			gameData.playerName.length <= 10
 		) {
 			localStorage.setItem("playerName", gameData.playerName);
-			// setGameData((prevData) => {
-			// 	return {...prevData, gameStarted: true};
-			// });
 			document.location.href = "/game.html";
 		}
 	}
-
-	useEffect(() => {
-
-		async function getCountry() {
-
-			try {
-				const response = await fetch("https://api.country.is/");
-
-				if (!response.ok) return;
-				setCountry((await response.json()).country);
-			}
-			catch (err) {
-				console.error(err.message);
-			}
-
-
-		}
-		if(country == null){
-		getCountry();
-
-		}
-	}, []);
 
 
 
