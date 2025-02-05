@@ -26,7 +26,8 @@ font-weight: 300!important; /* Or a specific numeric value like 700 */
 }
 
 .background-light-grey{
-background-color: #DEDEDE;
+/* background-color: #DEDEDE; */
+background-color: #f0edf287;
 }
 .gradient-auth{
 /* fallback for old browsers */

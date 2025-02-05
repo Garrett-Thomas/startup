@@ -96,10 +96,10 @@ function Register() {
     };
 
     return (
-        <div>
-            <Header />
+        <div className="gradient-leaderboard vh-100">
+        <Header />
             <ToastContainer />
-            <div className="row justify-content-center align-items-start  gradient-auth vh-90 w-100 m-0">
+            <div className="row justify-content-center align-items-start   w-100 m-0">
 
                 <form onSubmit={handleSubmit} className="max-width-login card bg-dark text-white mt-5">
                     <div className="container-fluid " />

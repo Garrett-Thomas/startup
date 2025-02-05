@@ -11,7 +11,7 @@ import cors from 'cors';
 import leaderBoardRoute from './routes/leaderboard.js';
 import authRoute from './routes/auth.js';
 
-import {addGameWon, addGamePlayed} from './routes/dbUtils.js';
+import { addGameWon, addGamePlayed } from './routes/dbUtils.js';
 
 
 // import fs from 'fs';
@@ -37,19 +37,6 @@ const HEARTBEAT_TIME = 1000 / 60;
 const DEFAULT_RADIUS = 50;
 const PLAYER_TIMEOUT = 100;
 const OBSTACLE_RADIUS = 200;
-
-// const AUTH_STRING = fs.readFileSync('.secret/db.txt', 'utf-8').trim();
-// const client = new MongoClient(AUTH_STRING, {
-//     serverApi: {
-//       version: ServerApiVersion.v1,
-//       strict: true,
-//       deprecationErrors: true,
-//     }
-//   });
-
-// await client.connect();
-// await client.db("startup").command({ping: 1});
-
 const gameStatus = {
     WAITING: "waiting",
     PLAYING: "playing",
@@ -71,7 +58,7 @@ const OBSTACLE_OPTIONS = {
     isStatic: true,
     restitution: 0,
     friction: 0,
-    slop:-1,
+    slop: -1,
 }
 
 const WORLD_OPTIONS = {
@@ -242,9 +229,6 @@ function deleteSockets() {
     // Although I'm iterating over stuff I'm deleting there doesn't seem to be an issue
     for (const [sockId, time] of socketLastSeen.entries()) {
 
-        // This is necessary because socket might be added
-        // I think this is possible because the client might send a ping
-        // Before all objects have been created server side
         if (!sockToGame.has(sockId)) continue;
 
         const currGame = gameIDToGame.get(sockToGame.get(sockId));
@@ -285,8 +269,8 @@ function makeLosers(winners) {
             idToSocket.get(loser.socketId).emit('game_end', { msg: "You Lost!" });
             idToSocket.get(winner.socketId).emit('game_end', { msg: "You Won!" });
 
-            if(loserToken){
-            addGamePlayed(loserToken);
+            if (loserToken) {
+                addGamePlayed(loserToken);
             }
         }
 
@@ -294,7 +278,7 @@ function makeLosers(winners) {
             idToSocket.get(winner.socketId).emit('game_end', { msg: "Opponnent disconnected" });
         }
 
-        if(winnerToken){
+        if (winnerToken) {
 
             console.log(winnerToken);
             addGameWon(winnerToken);
@@ -428,9 +412,10 @@ io.on("connection", (socket) => {
     socket.once("join", (data) => {
 
 
-        // Easiest to make a new data structure to store this
-        if(data.token) {
-            idToToken.set(socket.id, data.token); 
+        if (data.token) {
+
+            // Easiest to make a new data structure to store this
+            idToToken.set(socket.id, data.token);
         }
         userSetup(socket, data.playerName, data.color);
     })
@@ -445,7 +430,7 @@ app.use(express.json());
 
 app.use('/api/leaderboard', leaderBoardRoute);
 
-app.use('/api/', authRoute );
+app.use('/api/', authRoute);
 
 server.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`);

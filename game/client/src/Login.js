@@ -86,36 +86,37 @@ function Login() {
 
 
     return (
-        <div>
-            <Header />
+        <div className="gradient-leaderboard vh-100">
+        <Header />
+      
             <ToastContainer />
-            <div class="row justify-content-center align-items-start gradient-auth vh-90 w-100 m-0">
+            <div className ="row justify-content-center align-items-start  w-100 m-0">
 
 
-                <form onSubmit={handleSubmit} class="max-width-login card bg-dark text-white mt-5">
-                    <div class="container-fluid " />
-                    <div class="row justify-content-center align-items-center">
-                        <div class="col-5 p-5 w-100">
-                            <h3 class="fw-bold mb-2 text-uppercase text-center text-nowrap">Login</h3>
+                <form onSubmit={handleSubmit} className="max-width-login card bg-dark text-white mt-5">
+                    <div className="container-fluid " />
+                    <div className="row justify-content-center align-items-center">
+                        <div className="col-5 p-5 w-100">
+                            <h3 className="fw-bold mb-2 text-uppercase text-center text-nowrap">Login</h3>
                         </div>
                     </div>
 
-                    <div class="form-group p-2">
+                    <div className="form-group p-2">
 
 
-                        <label for="email" class="form-label">Email Address</label>
-                        <input type="email" required={true} name="email" onChange={handleChange} pattern="[^@\s]+@[^@\s]+\.[^@\s]+" class="form-control"  placeholder="Enter email" />
+                        <label htmlFor="email" className="form-label">Email Address</label>
+                        <input type="email" required={true} name="email" onChange={handleChange} pattern="[^@\s]+@[^@\s]+\.[^@\s]+" className="form-control"  placeholder="Enter email" />
 
                     </div>
 
-                    <div class="form-group p-2">
+                    <div className="form-group p-2">
 
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" name="password" required={true}class="form-control" onChange={handleChange} placeholder="Password" />
+                        <label htmlFor="password" className="form-label">Password</label>
+                        <input type="password" name="password" required={true}className="form-control" onChange={handleChange} placeholder="Password" />
                     </div>
-                    <div class="row ">
-                        <div class="col-5 p-5 align-items-center text-center w-100">
-                            <button type="submit" class="btn btn-outline-light btn-lg px-5">Submit</button>
+                    <div className="row ">
+                        <div className="col-5 p-5 align-items-center text-center w-100">
+                            <button type="submit" className="btn btn-outline-light btn-lg px-5">Submit</button>
                         </div>
                     </div>
                 </form>
