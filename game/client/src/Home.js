@@ -62,6 +62,7 @@ function Home() {
 
 
 		setPlayerName(e.target.value);
+		localStorage.setItem('playerName', e.target.value);
 
 	}
 

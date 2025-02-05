@@ -61,4 +61,4 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Responsive to window resizing** - Bootstrap and `display:flex' did most the work here. I'm really happy with the game rendering.
 - [x] **Application elements** - I used a lot of bootstrap grid
 - [x] **Application text content** - I used bootstrap fonts and it looks dope.
-- [x] **Application images** - I used an SVG image of the github logo as my link to my repo
+- [x] **Application images** - I used an SVG image of the github logo as my link to my repo & I have an image at the game.html endpoint

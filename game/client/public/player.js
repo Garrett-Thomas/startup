@@ -1,5 +1,5 @@
 class Tank {
-    constructor(x, y, r, id = -1, name = "" , gameId) {
+    constructor(x, y, r, id = -1, name = "" , gameId, pColor) {
         this.x = x;
         this.y = y;
         this.r = r;
@@ -8,8 +8,7 @@ class Tank {
         this.mass = this.r / 3;
         this.scale = 1;
         this.name = name;
-        this.pColor = color(180, 180, 180);
-
+        this.pColor = color(pColor);
         this.direction = createVector(0, 0);
     }
 

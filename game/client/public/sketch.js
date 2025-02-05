@@ -19,10 +19,7 @@ const BOOST_TIME = 3000;
 const BOOST_RECOVERY_TIME = 1000;
 const BOOST_AMOUNT = 0.5;
 const GRID_SIZE = 100;
-
-// let  WORLD_OPTIONS = {
-// 	gravity: { x: 0, y: 0 },
-// };
+const DEFAULT_COLOR = "#B4B4B4";
 
 let canv = null;
 let engine = null 
@@ -119,18 +116,18 @@ function getScale() {
 
 function sendPlayerData(name) {
 
-	socket.emit("join", { playerName: name, color: 0, token: localStorage.getItem('token') });
+	const color = localStorage.getItem('selectedColor') ? localStorage.getItem('selectedColor'): DEFAULT_COLOR 
+	socket.emit("join", { playerName: name, color: color,  token: localStorage.getItem('token') });
 }
 
 function getPlayerData() {
 
 	socket.once("init_data", (data) => {
-
-		console.log(data);
-
+		debugger;
+		console.log(data.player.color);
 		engine = Engine.create(data.WORLD_OPTIONS);
 		world = engine.world;
-		player = new Tank(data.player.x, data.player.y, data.player.r, data.player.socketId, data.player.name, data.player.gameId);
+		player = new Tank(data.player.x, data.player.y, data.player.r, data.player.socketId, data.player.name, data.player.gameId, data.player.color);
 
 		playerBody = Bodies.circle(data.player.x, data.player.y, data.player.r, data.PLAYER_OPTIONS);
 		obstacles = data.obstacles;
@@ -208,12 +205,12 @@ function setup() {
 			playerList.forEach((element) => {
 
 				if (element.socketId == player.socketId) {
-					player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId);
+					player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
 
 
 				}
 				else {
-					enemy = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId);
+					enemy = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
 				}
 			});
 
@@ -235,7 +232,6 @@ function setup() {
 	});
 
 	let name = localStorage.getItem("playerName");
-	debugger;
 	if (name == null || name.length > 20) {
 		window.location.href = "/";
 		
