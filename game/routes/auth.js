@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import { check, body, validationResult } from 'express-validator';
 import { registerUser, generateJWT, loginUser, verifyAndDecodeToken, getUserByEmail } from './dbUtils.js';
-
+const colors = ["#0d6efd", "#6610f2", "#d63384"];
 
 
 
@@ -91,6 +91,11 @@ router.get('/user-data', [check('token', 'JWT is required').notEmpty()], async (
     }
 
 
+});
+
+router.get('/user-colors', (req, res)=>{
+
+    res.json({colors: colors});
 });
 
 

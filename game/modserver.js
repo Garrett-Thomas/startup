@@ -430,6 +430,7 @@ app.use(express.json());
 
 app.use('/api/leaderboard', leaderBoardRoute);
 
+
 app.use('/api/', authRoute);
 
 server.listen(PORT, () => {

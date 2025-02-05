@@ -48,6 +48,17 @@ background: linear-gradient(to right, rgb(168, 98, 243), rgb(90, 146, 243));
 background: linear-gradient(to right, rgb(81, 75, 249), rgb(140, 170, 221));
 }
 
+.active{
+
+filter: brightness(50%);
+
+}
+
+.blue-600{
+
+  background-color:aquamarine;
+}
+
 body{
  height: 100vh; 
 }

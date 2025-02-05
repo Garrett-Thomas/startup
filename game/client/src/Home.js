@@ -2,18 +2,48 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { AuthContext } from "./context/auth";
 
-import React, { useState, useContext} from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 
 function Home() {
 
 	const { accountName, country, isAuthenticated } = useContext(AuthContext);
 
-	const [gameData, setGameData] = useState({
-		playerName: localStorage.getItem("playerName") || "unnamed",
-	});
+	const [playerName, setPlayerName] = useState(localStorage.getItem("playerName") || "Anon");
+
+	const [colorPallete, setColorPallete] = useState([]);
+
+	const [selectedColor, setSelectedColor] = useState(localStorage.getItem("selectedColor") || null);
 
 
 
+
+	useEffect(() => {
+
+		async function fetchColors() {
+
+			try {
+
+				const response = await fetch("http://localhost:4000/api/user-colors");
+
+				if (!response.ok) throw new Error();
+
+
+				const colors = (await response.json()).colors;
+				setColorPallete(colors);
+
+			}
+			catch (err) {
+				console.error(err);
+			}
+
+
+		}
+
+		if (isAuthenticated && colorPallete.length == 0) {
+			fetchColors();
+		}
+
+	}, [isAuthenticated, colorPallete]);
 
 
 	/**
@@ -26,22 +56,41 @@ function Home() {
 		return String.fromCodePoint(...codePoints);
 	}
 
-	function submit(e) {
-		if (
-			(e.code === "Enter" || e.type === "click") &&
-			gameData.playerName !== "" &&
-			gameData.playerName.length <= 10
-		) {
-			localStorage.setItem("playerName", gameData.playerName);
-			document.location.href = "/game.html";
+
+
+	function handleChange(e) {
+
+
+		setPlayerName(e.target.value);
+
+	}
+
+	function handleColorPick(e) {
+
+		if(e.target.value === selectedColor){
+
+			setSelectedColor(null);
+			localStorage.removeItem('selectedColor');
+		}
+
+		else{
+
+			setSelectedColor(e.target.value);
+			localStorage.setItem('selectedColor', e.target.value);
 		}
 	}
 
+	function submit(e) {
 
-
-
-
-
+		if (
+			(e.code === "Enter" || e.type === "click") &&
+			playerName !== "" &&
+			playerName.length <= 20
+		) {
+			localStorage.setItem("playerName", playerName);
+			document.location.href = "/game.html";
+		}
+	}
 
 
 	return (
@@ -66,7 +115,7 @@ function Home() {
 								<div className="col ">
 
 									<div className="input-group mb-3">
-										<input type="text" maxLength={20} minLength={1} className="form-control text-center" placeholder="Enter Name" aria-label="Recipient's username" aria-describedby="button-addon2" />
+										<input type="text" maxLength={20} minLength={1} className="form-control text-center" placeholder="Enter Name" aria-label="Recipient's username" onChange={handleChange} value={playerName} />
 										<button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={submit}>Play</button>
 									</div>
 								</div>
@@ -75,19 +124,65 @@ function Home() {
 
 
 							{isAuthenticated ?
+								<>
+									<div className="row text-center">
 
-								<div className="row text-center">
+										<div className="col-10">
 
-									<div className="col-10">
-
-										<div className="input-group mb-3">
-											<input type="text" maxLength={20} minLength={1} className="form-control text-center" placeholder="Enter join code to join a match" aria-label="Recipient's username" aria-describedby="button-addon2" />
-											<button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={()=>alert("To be implemented")}>Join/Create</button>
+											<div className="input-group mb-3">
+												<input type="text" maxLength={20} minLength={1} className="form-control text-center" placeholder="Enter join code to join a match" aria-label="Recipient's username" aria-describedby="button-addon2" />
+												<button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={() => alert("To be implemented")}>Join/Create</button>
+											</div>
 										</div>
 									</div>
-								</div>
 
+
+								</>
 								: <></>
+
+							}
+
+
+
+							{isAuthenticated && colorPallete.length > 0 ?
+
+
+								<>
+
+
+									<div className="row text-center mt-3">
+										<div className="col">
+											<h6 className="fw-light" >Choose your color:</h6>
+
+
+										</div>
+										<div className="btn-group" role="group" aria-label="Basic example">
+
+											{colorPallete.map((color, index) => {
+
+
+												const elem = <button key={index} type="button"  className={"btn btn-secondar p-4" + (color === selectedColor ? " active " : "")} value={color} style={{ backgroundColor: color }} onClick={handleColorPick} />
+
+												return (
+
+													elem
+
+
+												)
+											})}
+										</div>
+
+
+
+
+									</div>
+
+
+								</>
+								: <></>
+
+
+
 
 							}
 						</form>
@@ -100,25 +195,4 @@ function Home() {
 }
 
 
-/**
- * 
- *{isAuthenticated ?
-
-								<div className="row text-center">
-
-									<div className="col ">
-
-										<div className="input-group mb-3">
-											<input type="text" maxLength={20} minLength={1} className="form-control text-center" placeholder="Enter Name" aria-label="Recipient's username" aria-describedby="button-addon2" />
-											<button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={submit}>Play</button>
-										</div>
-									</div>
-
-									: <></>	
-							
-							} 
- * 
- * 
- * 
- */
 export default Home;
