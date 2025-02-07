@@ -27,9 +27,10 @@ class Tank {
         fill(this.pColor);
         ellipse(this.x, this.y, this.r * 2);
 
-        fill(255, 0, 0);
-        textSize(100);
-        text(this.name, this.x, this.y);
+        fill(20, 20, 20);
+        textSize(this.r);
+        textAlign(CENTER);
+        text(this.name, this.x, this.y + this.r * 2);
         pop();
     }
 }

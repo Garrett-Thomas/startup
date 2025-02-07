@@ -18,7 +18,7 @@ function Stats() {
 
             if (!token) return;
             try {
-                const response = await fetch('http://localhost:4000/api/user-data', {
+                const response = await fetch('/api/user-data', {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json',
@@ -29,7 +29,7 @@ function Stats() {
                 if (!response.ok) throw new Error();
 
                 const data = await response.json();
-                
+
                 setStats(data.user);
                 setLoading(false);
             }
@@ -47,23 +47,23 @@ function Stats() {
     if (loading) {
         return (
             <div className="gradient-leaderboard vh-100">
-            <Header/>
-            <div className="row  align-items-startw-100 m-0">
-                <Loading loadingText="Loading Your Stats..." />
+                <Header />
+                <div className="row  align-items-startw-100 m-0">
+                    <Loading loadingText="Loading Your Stats..." />
+                </div>
+                <Footer />
             </div>
-            <Footer/>
-</div>
         )
     }
-    else if(error){
+    else if (error) {
         return (
             <div className="gradient-leaderboard vh-100">
-            <Header/>
-            <div className="row  align-items-start w-100 m-0">
-                <Error errorText ="An Error Occurred While Loading Your Stats..." />
+                <Header />
+                <div className="row  align-items-start w-100 m-0">
+                    <Error errorText="An Error Occurred While Loading Your Stats..." />
+                </div>
+                <Footer />
             </div>
-            <Footer/>
-</div>
         )
 
 

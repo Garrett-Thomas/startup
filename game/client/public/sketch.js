@@ -18,7 +18,6 @@ let gameStartTimerId = null;
 const BOOST_TIME = 3000;
 const BOOST_RECOVERY_TIME = 1000;
 const BOOST_AMOUNT = 0.5;
-const GRID_SIZE = 100;
 const DEFAULT_COLOR = "#B4B4B4";
 
 let canv = null;
@@ -111,7 +110,7 @@ window.addEventListener('beforeunload', (event) => {
 function getScale() {
 	// TODO: Replace 50 w/ a const from server
 
-	return ((10 / player.r));
+	return ((30 /  player.r));
 }
 
 function sendPlayerData(name) {
@@ -275,7 +274,7 @@ function draw() {
 
 	if (state === gameState.PLAYING) {
 
-		screenDraw.drawGame(playerBody.position.x, playerBody.position.y, getScale(), ARENA_RADIUS, GRID_SIZE);
+		screenDraw.drawGame(playerBody.position.x, playerBody.position.y, getScale(), ARENA_RADIUS);
 		screenDraw.drawObstacles(obstacles);	
 
 		let x = mouseX;

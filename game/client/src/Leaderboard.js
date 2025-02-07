@@ -18,7 +18,7 @@ function Leaderboard() {
             try {
 
 
-                const response = await fetch("http://localhost:4000/api/leaderboard");
+                const response = await fetch("/api/leaderboard");
                 const data = await response.json();
 
                 setLeaderBoardData(data);
@@ -47,15 +47,15 @@ function Leaderboard() {
         )
     }
     if (error) {
-        return (        
-        <div className="gradient-leaderboard vh-100"> 
-            <Header />
+        return (
+            <div className="gradient-leaderboard vh-100">
+                <Header />
 
-            <div className="row  align-items-start w-100 m-0">
-                <Error errorText="Could not load Leaderboard" />
-            </div>
-            <Footer />
-        </div >
+                <div className="row  align-items-start w-100 m-0">
+                    <Error errorText="Could not load Leaderboard" />
+                </div>
+                <Footer />
+            </div >
         )
     }
 

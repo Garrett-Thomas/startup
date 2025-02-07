@@ -3,7 +3,7 @@ import fs from 'fs';
 import bcyrpt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-const {mongoURI, jwtSecret} = JSON.parse(fs.readFileSync('.secret/db.json', 'utf-8'));
+const {mongoURI, jwtSecret} = JSON.parse(fs.readFileSync('./db.json', 'utf-8'));
 
 const client = new MongoClient(mongoURI, {
     serverApi: {

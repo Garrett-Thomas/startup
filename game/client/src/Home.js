@@ -23,7 +23,7 @@ function Home() {
 
 			try {
 
-				const response = await fetch("http://localhost:4000/api/user-colors");
+				const response = await fetch('/api/user-colors');
 
 				if (!response.ok) throw new Error();
 

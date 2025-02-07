@@ -8,8 +8,8 @@ class screenDraw {
 		}
 	}
 
-	static _constrainEnd(endPoint, arenaSize, gridSize) {
-		if (endPoint > arenaSize / gridSize) return arenaSize / gridSize;
+	static _constrainEnd(endPoint, arenaSize) {
+		if (endPoint > arenaSize) return arenaSize ;
 		else {
 			return endPoint;
 		}
@@ -66,53 +66,37 @@ class screenDraw {
 		}
 		pop();
 	}
-	static drawGame(playerX, playerY, scle, arenaSize, gridSize) {
+	static drawGame(playerX, playerY, scle, arenaSize) {
 		background(30, 30, 30);
 
+
+		// (0, 0) now at center of the screen
 		translate(width / 2, height / 2);
+
+		// This scales all the elements so that they can appear bigger or smaller
+		// without having to modify their actual size
 		scale(scle);
+
+		// This ensures that (0, 0) is as far away from the player as possible	
+
 		translate(-playerX, -playerY);
 
-		// This codeblock ensures that only visible blocks on the
-		// grid are drawn. Speeds up rendering
-		let startX = Math.floor(
-			(playerX - width / scle / 2) / gridSize
-		);
 
-		// StartY is determined by how many blocks can fit between
-		// the center of the screen and y = 0.
-		// That number is floored to ensure that the
-		// player doesnt see a gap
-		let startY = Math.floor(
-			(playerY - height / scle / 2) / gridSize
-		);
-
-		let endX = Math.ceil(
-			(playerX + width / scle / 2) / gridSize
-		);
-
-		let endY = Math.ceil(
-			(playerY + height / scle / 2) / gridSize
-		);
-
-		// Constrain so that boundaries are defined
-		startX = this._constrainStart(startX);
-		startY = this._constrainStart(startY);
-		endX = this._constrainEnd(endX, arenaSize, gridSize);
-		endY = this._constrainEnd(endY, arenaSize, gridSize);
 
 		push();
+
+	
+		push();
+		fill(200, 205, 180);
+
+
+		const blockWidth = (arenaSize * 2.5);
+		square(-blockWidth / 2, -blockWidth / 2, blockWidth, arenaSize / 5);
+		pop();
+
 		fill(233, 224, 201);
-
-		// Draws all blocks on grid at appropriate places should
-		// any blocks be visibel
-		// for (var i = startY; i < endY; ++i) {
-		// 	for (var j = startX; j < endX; ++j) {
-		// 		rect(j * gridSize, i * gridSize, gridSize, gridSize);
-		// 	}
-
-		for (var i = 1; i < 10; i++) {
-			circle(startX + endX / 2, startY + endY / 2, (arenaSize * 2) / i);
+		for (var i = 1; i < 4; i++) {
+			circle(0,0, (arenaSize * 2) / i);
 		}
 
 		pop();

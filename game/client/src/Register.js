@@ -2,12 +2,12 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
-import React, { useState, useEffect, useContext} from "react";
-import {AuthContext} from './context/auth';
+import React, { useState, useEffect, useContext } from "react";
+import { AuthContext } from './context/auth';
 
 function Register() {
 
-    const {login, setName} = useContext(AuthContext);
+    const { login, setAccountName} = useContext(AuthContext);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
@@ -58,6 +58,7 @@ function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+            debugger;
 
         const errors = validateForm(formData);
         setFormErrors(errors);
@@ -65,7 +66,7 @@ function Register() {
         if (Object.keys(errors).length > 0) return;
 
         try {
-            const response = await fetch('http://localhost:4000/api/register', {
+            const response = await fetch('/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -80,9 +81,8 @@ function Register() {
                 let err = new Error(errorData.msg);
                 throw err;
             }
-
-            login(response.json().token);
-            setName(formData.name);
+            login((await response.json()).token);
+            setAccountName(formData.name);
             navigate('/');
         }
         catch (error) {
@@ -97,7 +97,7 @@ function Register() {
 
     return (
         <div className="gradient-leaderboard vh-100">
-        <Header />
+            <Header />
             <ToastContainer />
             <div className="row justify-content-center align-items-start   w-100 m-0">
 
