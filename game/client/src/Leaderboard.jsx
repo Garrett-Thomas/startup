@@ -4,7 +4,7 @@ import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Loading from "./components/Loading";
 import Error from "./components/Error";
-
+import "./Register.css";
 function Leaderboard() {
 
 
@@ -17,7 +17,7 @@ function Leaderboard() {
         const fetchLeaderboardData = async () => {
             try {
 
-
+                debugger;
                 const response = await fetch("/api/leaderboard");
                 const data = await response.json();
 
@@ -60,10 +60,10 @@ function Leaderboard() {
     }
 
     return (
-        <div className="gradient-leaderboard vh-100">
+        <div className="gradient-leaderboard ">
             <Header />
             <div className="row  align-items-start  w-100 m-0">
-                <div className=" max-min-width-leaderboard container text-center card mt-5">
+                <div className=" max-min-width-leaderboard container text-center card mt-5 mb-10">
                     <div className="row row-cols-3 row-cols-lg-3 gx-3 g-lg-3 ">
                         <div className="col p-3">
                             <div className="d-flex justify-content-bottom align-items-bottom h-100">

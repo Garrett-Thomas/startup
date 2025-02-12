@@ -1,19 +1,7 @@
 class screenDraw {
 
 
-	static _constrainStart(startPoint) {
-		if (startPoint < 0) return 0;
-		else {
-			return startPoint;
-		}
-	}
 
-	static _constrainEnd(endPoint, arenaSize) {
-		if (endPoint > arenaSize) return arenaSize ;
-		else {
-			return endPoint;
-		}
-	}
 	static drawWaitScreen(playerX, playerY) {
 		push();
 

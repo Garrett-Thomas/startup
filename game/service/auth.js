@@ -98,6 +98,20 @@ router.get('/user-colors', (req, res)=>{
     res.json({colors: colors});
 });
 
+router.get('/user-country', async (req, res)=>{
 
+    const req_string = `https://api.country.is/${req.header('x-forwarded-for')}`;
+
+    const response = await fetch(req_string);
+
+    const country = (await response.json()).country;
+
+    if(country){
+
+    return res.json({country: country});
+    }
+
+    return res.json({country: ""});
+})
 
 export default router;

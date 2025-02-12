@@ -1,13 +1,13 @@
 import "./App.css";
-import Login from "./Login";
-import Home from "./Home";
-import Register from "./Register";
-import Stats from "./Stats";
+import Login from "./Login.jsx";
+import Home from "./Home.jsx";
+import Register from "./Register.jsx";
+import Stats from "./Stats.jsx";
 import React, { useContext, useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Leaderboard from "./Leaderboard";
+import Leaderboard from "./Leaderboard.jsx";
 import { jwtDecode } from "jwt-decode";
-import { AuthContext } from "./context/auth";
+import { AuthContext } from "./context/auth.jsx";
 function App() {
 
 

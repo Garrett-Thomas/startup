@@ -151,11 +151,11 @@ function setup() {
 		!document.referrer.includes(window.location.hostname) ||
 		localStorage.getItem("playerName") == null
 	) {
-		document.location.replace(`http://${window.location.hostname}:3000`);
+		document.location.replace(`/`);
 	}
 
 	// Fancy way of passing the name in on init connection
-	socket = io(`http://${window.location.hostname}:4000`);
+	socket = io();
 
 	if (canv == null) {
 		let { canvW, canvH } = getWidthHeight();

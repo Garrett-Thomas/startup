@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 
@@ -27,10 +27,15 @@ const AuthProvider = ({ children }) => {
 async function getCountry() {
 
 			try {
-				const response = await fetch("https://api.country.is/");
+				const response = await fetch("/api/user-country");
+
+        const country = (await response.json()).country
 
 				if (!response.ok) return;
-				setCountry((await response.json()).country);
+        if(country){
+
+				setCountry(country);
+        } 
 			}
 			catch (err) {
 				console.error(err.message);
@@ -63,7 +68,7 @@ async function getCountry() {
     }
 
     else{
-      // If no token then this acts as a reset for all of the values
+
       logout();
     }
 

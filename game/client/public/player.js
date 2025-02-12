@@ -24,8 +24,17 @@ class Tank {
 
     draw() {
         push();
+
+
+
+
+
         fill(this.pColor);
         ellipse(this.x, this.y, this.r * 2);
+
+        push();
+        fill(20, 20, 20)
+
 
         fill(20, 20, 20);
         textSize(this.r);

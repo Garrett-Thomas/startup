@@ -28,7 +28,7 @@ const io = new Server(server);
 app.use(cors());
 
 
-const PORT = 5000;
+const PORT = 6000;
 const ARENA_RADIUS = 2000;
 const HEARTBEAT_TIME = 1000 / 60;
 const DEFAULT_RADIUS = 100;

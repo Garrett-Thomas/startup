@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from './context/auth';
+import "./Register.css";
 
 function Register() {
 
@@ -96,16 +97,16 @@ function Register() {
     };
 
     return (
-        <div className="gradient-leaderboard vh-100">
+        <div className="gradient-leaderboard ">
             <Header />
             <ToastContainer />
             <div className="row justify-content-center align-items-start   w-100 m-0">
 
-                <form onSubmit={handleSubmit} className="max-width-login card bg-dark text-white mt-5">
+                <form onSubmit={handleSubmit} className="max-width-login card bg-dark text-white mt-5 mb-10">
                     <div className="container-fluid " />
                     <div className="row">
                         <div className="col-5 p-5 w-100">
-                            <h3 className="fw-bold mb-2 text-uppercase text-center text-nowrap">Register</h3>
+                            <h3 className="fw-bold mb-1 text-uppercase text-center text-nowrap">Register</h3>
                         </div>
                     </div>
                     <div className="form-group p-2">
