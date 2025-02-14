@@ -389,7 +389,6 @@ function heartbeat() {
 
 io.on("connection", (socket) => {
 
-    console.log(`Client connecting: ${socket.id}`);
     socket.on("update", (data) => {
         try {
             if (socketLastSeen.has(socket.id)) {
@@ -425,13 +424,6 @@ io.on("connection", (socket) => {
     console.log(`Player joined: ${socket.id}`);
 });
 
-
-app.use((req, res, next)=>{
-
-    console.log(1);
-    next();
-
-});
 
 app.use(express.json());
 

@@ -62,3 +62,9 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Application elements** - I used a lot of bootstrap grid
 - [x] **Application text content** - I used bootstrap fonts and it looks dope.
 - [x] **Application images** - I used an SVG image of the github logo as my link to my repo & I have an image at the game.html endpoint
+
+## 🚀 React part 1: Routing deliverable
+
+- [x] **Bundled using Vite** - Easy to install and use Vite.
+- [x] **Components** - Major html elements are now inside components
+- [x] **Router** - Routing implemented with React Router

@@ -17,14 +17,15 @@ printf "\n----> Deploying React bundle $service to $hostname with $key\n"
 
 # Step 1
 printf "\n----> Build the distribution package\n"
-rm -rf build 
+rm -rf dist 
 mkdir build
 cd client
 npm run build 
 cd ../
-mv client/build build/public
+mv client/dist build/public
 
 cp service/* build/ # move the back end service to the target distribution
+
 
 # Step 2
 printf "\n----> Clearing out previous distribution on the target\n"

@@ -145,13 +145,12 @@ function getPlayerData() {
 function setup() {
 	noLoop();
 
-	// if (
-	// 	!document.referrer.includes(window.location.hostname) ||
-	// 	localStorage.getItem("playerName") == null
-	// ) {
-	// 	document.location.replace(`/`);
-	// }
-	debugger;
+	if (
+		!document.referrer.includes(window.location.hostname) ||
+		localStorage.getItem("playerName") == null
+	) {
+		document.location.replace(`/`);
+	}
 	socket = io();
 
 	if (canv == null) {
@@ -227,18 +226,18 @@ function setup() {
 		}
 	});
 
-	// let name = localStorage.getItem("playerName");
-	// if (name == null || name.length > 20) {
-	// 	// window.location.href = "/";
+	let name = localStorage.getItem("playerName");
+	if (name == null || name.length > 20) {
+		window.location.href = "/";
 		
-	// }
-	// else{
+	}
+	else{
 	sendPlayerData(name);
 	getPlayerData();
 
 	frameRate(60);
 
-	// }
+	}
 }
 
 // Need to figure out how to scale by screen size too.
