@@ -17,7 +17,8 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "dev": "vite"
+    "dev": "vite",
+    "build":"vite build"
   },
   "proxy": "http://localhost:6000",
   "eslintConfig": {

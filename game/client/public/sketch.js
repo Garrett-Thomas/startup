@@ -7,8 +7,6 @@ let ARENA_RADIUS;
 let player = null;
 let enemy = null;
 
-let p5Canvas = null;
-
 let boosting = false;
 let canBoost = true;
 let boostTimer = null;
@@ -147,14 +145,13 @@ function getPlayerData() {
 function setup() {
 	noLoop();
 
-	if (
-		!document.referrer.includes(window.location.hostname) ||
-		localStorage.getItem("playerName") == null
-	) {
-		document.location.replace(`/`);
-	}
-
-	// Fancy way of passing the name in on init connection
+	// if (
+	// 	!document.referrer.includes(window.location.hostname) ||
+	// 	localStorage.getItem("playerName") == null
+	// ) {
+	// 	document.location.replace(`/`);
+	// }
+	debugger;
 	socket = io();
 
 	if (canv == null) {
@@ -230,24 +227,25 @@ function setup() {
 		}
 	});
 
-	let name = localStorage.getItem("playerName");
-	if (name == null || name.length > 20) {
-		window.location.href = "/";
+	// let name = localStorage.getItem("playerName");
+	// if (name == null || name.length > 20) {
+	// 	// window.location.href = "/";
 		
-	}
-	else{
+	// }
+	// else{
 	sendPlayerData(name);
 	getPlayerData();
 
 	frameRate(60);
-	}
+
+	// }
 }
 
 // Need to figure out how to scale by screen size too.
 // View of world should remain the same regardless of screen size
 
 function draw() {
-
+	console.log('running');
 	if (state === gameState.GAME_START_DISCONNECT){
 		screenDraw.drawGameOver(gameOverMsg);
 

@@ -17,7 +17,6 @@ function Leaderboard() {
         const fetchLeaderboardData = async () => {
             try {
 
-                debugger;
                 const response = await fetch("/api/leaderboard");
                 const data = await response.json();
 
