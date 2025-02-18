@@ -44,8 +44,6 @@ ssh -i "$key" ubuntu@$hostname << ENDSSH
 bash -i
 cd services/${service}
 npm install
-pm2 delete game
-pm2 start server.js
 ENDSSH
 
 # Step 5

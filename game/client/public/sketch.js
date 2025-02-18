@@ -19,7 +19,7 @@ const BOOST_AMOUNT = 0.5;
 const DEFAULT_COLOR = "#B4B4B4";
 
 let canv = null;
-let engine = null 
+let engine = null
 let world = null;
 let playerBody;
 let deathDone = false;
@@ -31,13 +31,10 @@ let gameState = {
 	GAME_OVER: "game_over",
 	GAME_START_DISCONNECT: "game_start_disconnect"
 }
-let oldTime = 0;
 
 let state = null;
 let gameOverMsg = "";
 let obstacles = null;
-
-// let leaderboard = new Leaderboard();
 
 // Hash function,  stole off of stackoverflow
 // Use it go get a color based off of players name
@@ -77,6 +74,7 @@ function windowResized() {
 		resizeCanvas(800, 800 * (1 / aspectRatio));
 
 	}
+
 	canvas.style.width = canvW + "px";
 	canvas.style.height = canvH + "px";
 
@@ -108,19 +106,18 @@ window.addEventListener('beforeunload', (event) => {
 function getScale() {
 	// TODO: Replace 50 w/ a const from server
 
-	return ((30 /  player.r));
+	return ((30 / player.r));
 }
 
 function sendPlayerData(name) {
 
-	const color = localStorage.getItem('selectedColor') ? localStorage.getItem('selectedColor'): DEFAULT_COLOR 
-	socket.emit("join", { playerName: name, color: color,  token: localStorage.getItem('token') });
+	const color = localStorage.getItem('selectedColor') ? localStorage.getItem('selectedColor') : DEFAULT_COLOR
+	socket.emit("join", { playerName: name, color: color, token: localStorage.getItem('token') });
 }
 
 function getPlayerData() {
 
 	socket.once("init_data", (data) => {
-		debugger;
 		console.log(data.player.color);
 		engine = Engine.create(data.WORLD_OPTIONS);
 		world = engine.world;
@@ -129,7 +126,7 @@ function getPlayerData() {
 		playerBody = Bodies.circle(data.player.x, data.player.y, data.player.r, data.PLAYER_OPTIONS);
 		obstacles = data.obstacles;
 
-		for(const ob of data.obstacles){
+		for (const ob of data.obstacles) {
 			World.add(world, Bodies.circle(ob.x, ob.y, ob.r, data.OBSTACLE_OPTIONS));
 		}
 
@@ -171,7 +168,7 @@ function setup() {
 
 	});
 
-	socket.once("game_start disconnect", (data)=>{
+	socket.once("game_start disconnect", (data) => {
 		state = gameState.GAME_START_DISCONNECT;
 		gameOverMsg = data.msg;
 		clearInterval(gameStartTimerId);
@@ -191,35 +188,54 @@ function setup() {
 	});
 
 	socket.on("heartbeat", (data) => {
-		
-		const playerList = data.players;
-		let timing = data.timing;
 
-		console.log(data.timing.timestamp);
+		const playerList = data.players;
+		// let timing = data.timing;
+
 		if (player != null && world != null) {
 			playerList.forEach((element) => {
 
-				if (element.socketId == player.socketId) {
-					player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
 
+				// This causes a lot of jerkiness. Need to find a way to really just lerp it.
+				// Maybe the update data should be stored in an object attribute and I just continously lerp towards
+				// it with an exponential decay function so that smaller steps are taken as the object gets closer.
+				// This would remove a lot of jitter but would allow the client to be updated reasonably if big jumps are necessary
+
+				if (element.socketId === player.socketId) {
+
+					// player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
+					player.newX = element.x;
+					player.newY = element.y;
 
 				}
 				else {
+					// if(enemy == null){
+
 					enemy = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
+					// }
+
+					// else{
+						// enemy.newX = element.x;
+						// enemy.newY = element.y;
+
+
+
+					// }
 				}
 			});
 
 			// Step it 16ms + deltaTime
-			Engine.update(engine, timing - oldTime);
-			oldTime = timing;
-			// Move physics body to position given on server
-			// translation start is relative to body which is why
-			// old.x - current.x
+			// Engine.update(engine, timing - oldTime);
+			// oldTime = timing;
 
-			Body.translate(playerBody, {
-				x: player.x - playerBody.position.x,
-				y: player.y - playerBody.position.y,
-			});
+			// // Move physics body to position given on server
+			// // translation start is relative to body which is why
+			// // old.x - current.x
+
+			// Body.translate(playerBody, {
+			// 	x: player.x - playerBody.position.x,
+			// 	y: player.y - playerBody.position.y,
+			// });
 
 			// Body.applyForce(playerBody, { x: 0, y: 0 }, playerList.filter((element) => element.socketId === player.socketId)[0].vector);
 
@@ -229,13 +245,13 @@ function setup() {
 	let name = localStorage.getItem("playerName");
 	if (name == null || name.length > 20) {
 		window.location.href = "/";
-		
-	}
-	else{
-	sendPlayerData(name);
-	getPlayerData();
 
-	frameRate(60);
+	}
+	else {
+		sendPlayerData(name);
+		getPlayerData();
+
+		frameRate(60);
 
 	}
 }
@@ -244,14 +260,13 @@ function setup() {
 // View of world should remain the same regardless of screen size
 
 function draw() {
-	console.log('running');
-	if (state === gameState.GAME_START_DISCONNECT){
+	if (state === gameState.GAME_START_DISCONNECT) {
 		screenDraw.drawGameOver(gameOverMsg);
 
 	}
 	if (state === gameState.WAITING) {
 		// draw waiting screen
-		screenDraw.drawWaitScreen(playerBody.position.x, playerBody.position.y);
+		screenDraw.drawWaitScreen(width / 2, height / 2);
 		socket.emit('ping', { msg: state });
 
 	}
@@ -271,8 +286,9 @@ function draw() {
 
 	if (state === gameState.PLAYING) {
 
-		screenDraw.drawGame(playerBody.position.x, playerBody.position.y, getScale(), ARENA_RADIUS);
-		screenDraw.drawObstacles(obstacles);	
+		// screenDraw.drawGame(playerBody.position.x, playerBody.position.y, getScale(), ARENA_RADIUS);
+		screenDraw.drawGame(player.x, player.y, getScale(), ARENA_RADIUS);
+		screenDraw.drawObstacles(obstacles);
 
 		let x = mouseX;
 		let y = mouseY;
@@ -283,14 +299,15 @@ function draw() {
 		let theta = Math.atan(player.direction.y / player.direction.x);
 		theta += player.direction.x < 0 ? Math.PI : 0;
 
-		let x2 = Math.cos(theta) * player.r;
-		let y2 = Math.sin(theta) * player.r;
+		// let x2 = Math.cos(theta) * player.r;
+		// let y2 = Math.sin(theta) * player.r;
 
-		x2 += playerBody.position.x;
-		y2 += playerBody.position.y;
-		Body.applyForce(playerBody, {x: 0, y:0}, {x: x2, y: y2});	
+		// x2 += playerBody.position.x;
+		// y2 += playerBody.position.y;
+		// Body.applyForce(playerBody, { x: 0, y: 0 }, { x: x2, y: y2 });
 
-		line(playerBody.position.x, playerBody.position.y, x2, y2);
+		// line(playerBody.position.x, playerBody.position.y, x2, y2);
+		line(player.x, player.y, player.x + Math.cos(theta) * player.r, player.y + Math.sin(theta) * player.r);
 
 		if (enemy != null) {
 			enemy.draw();

@@ -86,6 +86,7 @@ async function getCountry() {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.setItem('accountName', 'Player');
     localStorage.setItem('isAuthenticated', false);
     setAuthenticated(false);
     setToken(null);

@@ -8,7 +8,7 @@ function Home() {
 
 	const { accountName, country, isAuthenticated } = useContext(AuthContext);
 
-	const [playerName, setPlayerName] = useState(localStorage.getItem("playerName") || "Anon");
+	const [playerName, setPlayerName] = useState(localStorage.getItem("playerName") || localStorage.getItem("accountName"));
 
 	const [colorPallete, setColorPallete] = useState([]);
 

@@ -5,9 +5,8 @@ const server = http.createServer(app);
 import { Server } from 'socket.io';
 
 import pkg from 'matter-js';
-const { Engine, Bodies, Body, World, Matter } = pkg;
+const { Engine, Bodies, Body, World, Vector} = pkg;
 import { v4 as uuidv4 } from 'uuid';
-import cors from 'cors';
 import leaderBoardRoute from './leaderboard.js';
 import authRoute from './auth.js';
 
@@ -36,6 +35,11 @@ const HEARTBEAT_TIME = 1000 / 60;
 const DEFAULT_RADIUS = 100;
 const PLAYER_TIMEOUT = 1000;
 const OBSTACLE_RADIUS = 200;
+
+// 10 m/s?
+const MAX_SPEED = 15;
+
+
 const gameStatus = {
     WAITING: "waiting",
     PLAYING: "playing",
@@ -44,6 +48,10 @@ const gameStatus = {
 }
 
 const spawnOptions = [[[-1, 0], [1, 0]], [[0, 1], [0, -1]]];
+
+const startTime = 1000;
+
+
 
 const PLAYER_OPTIONS = {
     friction: 0,
@@ -154,7 +162,8 @@ function userSetup(socket, name, color) {
             status: gameStatus.WAITING,
             gameStartTimerId: null,
             spawnLocations: spwn,
-            spawnChosen: randLoc
+            spawnChosen: randLoc,
+            lastTime: -1
         }
 
 
@@ -341,12 +350,13 @@ function heartbeat() {
 
 
         if (value.players.length == 2 && value.status == gameStatus.WAITING) {
-            const startTime = Date.now() + 3000;
             value.status = gameStatus.GAME_START;
+
+            let currTime = Date.now();
             value.players.forEach((player) => {
 
                 // Get each to start after a 3 second delay at the same time
-                idToSocket.get(player.socketId).emit('game_start', { startTime: startTime });
+                idToSocket.get(player.socketId).emit('game_start', { startTime: startTime + currTime });
             });
 
 
@@ -358,19 +368,32 @@ function heartbeat() {
         }
         else if (value.players.length == 2 && value.status === gameStatus.PLAYING) {
 
+            if(value.lastTime === -1){
+                value.lastTime = Date.now();
 
             Engine.update(value.engine, HEARTBEAT_TIME);
+            }
+            else{
+
+            Engine.update(value.engine, Date.now() - value.lastTime);
+                value.lastTime = Date.now();
+            }
+
             value.players.forEach((player) => {
 
-                if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
-                    value.status = gameStatus.WON;
-                    losers.push(player);
-                }
-
-                const { x, y } = playerBodies.get(player.socketId).position;
+                // if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
+                //     value.status = gameStatus.WON;
+                //     losers.push(player);
+                // }
+                
+                const playerBody = playerBodies.get(player.socketId);
+                const { x, y } = playerBody.position;
                 player.x = x;
                 player.y = y;
 
+                if(Vector.magnitude(playerBody.velocity) > MAX_SPEED){
+                    playerBody.velocity = Vector.mult(Vector.normalise(playerBody.velocity), MAX_SPEED);
+                }
 
             });
         }
@@ -393,7 +416,11 @@ io.on("connection", (socket) => {
         try {
             if (socketLastSeen.has(socket.id)) {
                 socketLastSeen.set(socket.id, Date.now());
-                Body.applyForce(playerBodies.get(socket.id), { x: 0, y: 0 }, data.vector);
+                const player = playerBodies.get(socket.id);
+                
+
+                Body.applyForce(player, { x: 0, y: 0 }, data.vector);
+
             }
         }
         catch (err) {
