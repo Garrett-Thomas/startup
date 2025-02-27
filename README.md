@@ -68,3 +68,8 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 - [x] **Bundled using Vite** - Easy to install and use Vite.
 - [x] **Components** - Major html elements are now inside components
 - [x] **Router** - Routing implemented with React Router
+
+## 🚀 React part 2: Interactivity
+
+- [x] **All functionality implemented** - All pages use endpoints on the server & data is persisted between page loads via local storage.
+- [x] **Hooks** - useEffect, useState, useContext are all used in the react app.
