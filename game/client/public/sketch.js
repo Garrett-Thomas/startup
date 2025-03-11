@@ -21,9 +21,14 @@ const DEFAULT_COLOR = "#B4B4B4";
 let canv = null;
 let engine = null
 let world = null;
+let delay = 0;
 let playerBody;
 let deathDone = false;
 let gameStartTime = 0;
+
+let updateQueue = [];
+
+
 let gameState = {
 	WAITING: "waiting",
 	GAME_START: "game_start",
@@ -40,6 +45,10 @@ let obstacles = null;
 // Use it go get a color based off of players name
 // Continues the simulation but the text takes the players body so the text
 // will move in the direction that the player was last moving
+
+
+
+
 
 function reset() {
 	World.clear(world, true);
@@ -189,6 +198,10 @@ function setup() {
 
 	socket.on("heartbeat", (data) => {
 
+		delay = Date.now();
+
+
+
 		const playerList = data.players;
 		// let timing = data.timing;
 
@@ -206,6 +219,7 @@ function setup() {
 					// player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
 					player.newX = element.x;
 					player.newY = element.y;
+					updateQueue.push({ x: element.x, y: element.y, delay: Date.now() - data.time});
 
 				}
 				else {
@@ -215,8 +229,8 @@ function setup() {
 					// }
 
 					// else{
-						// enemy.newX = element.x;
-						// enemy.newY = element.y;
+					// enemy.newX = element.x;
+					// enemy.newY = element.y;
 
 
 
@@ -292,8 +306,11 @@ function draw() {
 
 		let x = mouseX;
 		let y = mouseY;
+
 		player.update(createVector(x - width / 2, y - height / 2));
 		player.draw();
+
+
 
 		// Math to make the pointer line in the player
 		let theta = Math.atan(player.direction.y / player.direction.x);
@@ -313,6 +330,11 @@ function draw() {
 			enemy.draw();
 		}
 
+		console.log(updateQueue);
+
+		if (updateQueue.length > 2) {
+			updateQueue = updateQueue.slice(1, 3);
+		}
 		screenDraw.drawFPS(playerBody.position.x, playerBody.position.y, getScale());
 		screenDraw.drawBoostGauge(playerBody.position.x, playerBody.position.y, getScale());
 
@@ -351,6 +373,8 @@ function draw() {
 			},
 			gameId: player.gameId,
 		};
+
+		delay = Date.now() - delay;
 
 		socket.emit("update", p);
 

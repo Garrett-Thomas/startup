@@ -401,7 +401,7 @@ function heartbeat() {
 
         value.players.forEach((player) => {
 
-            idToSocket.get(player.socketId).emit('heartbeat', { players: value.players, timing: value.engine.timing });
+            idToSocket.get(player.socketId).emit('heartbeat', { players: value.players, time: Date.now() });
         });
     });
 
