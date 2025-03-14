@@ -73,3 +73,14 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 - [x] **All functionality implemented** - All pages use endpoints on the server & data is persisted between page loads via local storage.
 - [x] **Hooks** - useEffect, useState, useContext are all used in the react app.
+
+
+## 🚀 Service deliverable
+
+- [x] **Node.js/Express HTTP service** - Installed Express with NPM. Default port on 4000.js.
+- [x] **Static middleware for frontend** - Simple endpoints in `service` folder.
+- [x] **Calls to third party endpoints** - Home page makes a call to 3rd party service that
+returns the country code based upon the ip address of the user. 
+- [x] **Backend service endpoints** - Simple endpoints in `service` folder. 
+- [x] **Frontend calls service endpoints** - All mocked functionality removed from the frontend and replaced with calls to the service.
+- [x] **Supports registration, login, logout, and restricted endpoint** - Fully support authentication and restrict access to user stats.

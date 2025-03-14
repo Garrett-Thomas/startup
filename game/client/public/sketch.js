@@ -47,7 +47,27 @@ let obstacles = null;
 // will move in the direction that the player was last moving
 
 
+setInterval(() => {
+	if (state === gameState.PLAYING) {
 
+		let boostSpeed = boosting ? BOOST_AMOUNT / getScale() : 1;
+		let p = {
+			x: player.x,
+			y: player.y,
+			r: player.r,
+			vector: {
+				x: player.direction.x * boostSpeed,
+				y: player.direction.y * boostSpeed,
+			},
+			gameId: player.gameId,
+		};
+
+		delay = Date.now() - delay;
+
+		socket.emit("update", p);
+	}
+
+}, UPDATE_TIME);
 
 
 function reset() {
@@ -219,7 +239,7 @@ function setup() {
 					// player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
 					player.newX = element.x;
 					player.newY = element.y;
-					updateQueue.push({ x: element.x, y: element.y, delay: Date.now() - data.time});
+					updateQueue.push({ x: element.x, y: element.y, delay: Date.now() - data.time });
 
 				}
 				else {
@@ -252,6 +272,9 @@ function setup() {
 			// });
 
 			// Body.applyForce(playerBody, { x: 0, y: 0 }, playerList.filter((element) => element.socketId === player.socketId)[0].vector);
+			if (updateQueue.length > 10) {
+				updateQueue = updateQueue.slice(1, 3);
+			}
 
 		}
 	});
@@ -330,11 +353,8 @@ function draw() {
 			enemy.draw();
 		}
 
-		console.log(updateQueue);
 
-		if (updateQueue.length > 2) {
-			updateQueue = updateQueue.slice(1, 3);
-		}
+
 		screenDraw.drawFPS(playerBody.position.x, playerBody.position.y, getScale());
 		screenDraw.drawBoostGauge(playerBody.position.x, playerBody.position.y, getScale());
 
@@ -361,22 +381,7 @@ function draw() {
 		}
 
 		// Boost amount is scaled, but not proportional to mass
-		let boostSpeed = boosting ? BOOST_AMOUNT / getScale() : 1;
 
-		let p = {
-			x: player.x,
-			y: player.y,
-			r: player.r,
-			vector: {
-				x: player.direction.x * boostSpeed,
-				y: player.direction.y * boostSpeed,
-			},
-			gameId: player.gameId,
-		};
-
-		delay = Date.now() - delay;
-
-		socket.emit("update", p);
 
 	}
 }
