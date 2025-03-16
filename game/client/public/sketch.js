@@ -239,6 +239,7 @@ function setup() {
 					// player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
 					player.newX = element.x;
 					player.newY = element.y;
+					console.log(element);
 					updateQueue.push({ x: element.x, y: element.y, delay: Date.now() - data.time });
 
 				}
@@ -321,16 +322,18 @@ function draw() {
 		screenDraw.drawGameOver(gameOverMsg);
 	}
 
-	if (state === gameState.PLAYING) {
+	if (state === gameState.PLAYING && player !== null) {
 
 		// screenDraw.drawGame(playerBody.position.x, playerBody.position.y, getScale(), ARENA_RADIUS);
-		screenDraw.drawGame(player.x, player.y, getScale(), ARENA_RADIUS);
-		screenDraw.drawObstacles(obstacles);
-
 		let x = mouseX;
 		let y = mouseY;
 
 		player.update(createVector(x - width / 2, y - height / 2));
+		screenDraw.drawGame(player.x, player.y, getScale(), ARENA_RADIUS);
+		screenDraw.drawObstacles(obstacles);
+
+		
+
 		player.draw();
 
 

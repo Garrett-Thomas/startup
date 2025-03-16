@@ -1,8 +1,16 @@
 ## Game
 - 2 players per game, hashmap in the backend mapping gameid to to game engine
 
-- Need to check edge case where I have a person joins as a new game is created. Could be possible that it returns an error even though there is a spot for them in the game. 
 
+- Want to revert back to simulation running on client side w/ delta time
+
+- Client -> delay -> server -> client
+
+- If I use prediction on the client then get the update from the server, the info will
+be ~20-100ms old.
+
+- I should just send all information to the server then render what I get back. Some packets
+will be lost but should just lerp if no update
 
 ## LOG
 

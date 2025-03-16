@@ -363,7 +363,7 @@ function heartbeat() {
             // I think this is causing issues because players may disconnect during the Game_start phase, but this event still happens
             value.gameStartTimerId = setTimeout(() => {
                 value.status = gameStatus.PLAYING;
-            }, startTime - Date.now());
+            }, (startTime + currTime) - Date.now());
 
         }
         else if (value.players.length == 2 && value.status === gameStatus.PLAYING) {
@@ -379,7 +379,7 @@ function heartbeat() {
                 value.lastTime = Date.now();
             }
 
-            value.players.forEach((player) => {
+            value.players.forEach((player, index) => {
 
                 // if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
                 //     value.status = gameStatus.WON;
@@ -390,7 +390,9 @@ function heartbeat() {
                 const { x, y } = playerBody.position;
                 player.x = x;
                 player.y = y;
-
+                if(index == 0){
+                console.log(playerBody.position)
+                }
                 if(Vector.magnitude(playerBody.velocity) > MAX_SPEED){
                     playerBody.velocity = Vector.mult(Vector.normalise(playerBody.velocity), MAX_SPEED);
                 }

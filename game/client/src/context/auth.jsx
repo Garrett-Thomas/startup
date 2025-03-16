@@ -16,8 +16,8 @@ const AuthContext = createContext({});
 
 const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem('token') || null);
-  const [accountName, setAccountName] = useState(localStorage.getItem("accountName") || "Player");
-  const [isAuthenticated, setAuthenticated] = useState(null);
+  const [accountName, setAccountName] = useState(token ? localStorage.getItem("accountName") : "Player");
+  const [isAuthenticated, setAuthenticated] = useState(token ? true : false);
   const [country, setCountry] = useState(null);
 
 
