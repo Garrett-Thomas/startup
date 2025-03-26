@@ -84,3 +84,6 @@ returns the country code based upon the ip address of the user.
 - [x] **Backend service endpoints** - Simple endpoints in `service` folder. 
 - [x] **Frontend calls service endpoints** - All mocked functionality removed from the frontend and replaced with calls to the service.
 - [x] **Supports registration, login, logout, and restricted endpoint** - Fully support authentication and restrict access to user stats.
+
+## 🚀 DB deliverable
+- [x] **Stores data in MongoDB** - User credentials and data are stored in the database

@@ -237,45 +237,18 @@ function setup() {
 				if (element.socketId === player.socketId) {
 
 					// player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
-					player.newX = element.x;
-					player.newY = element.y;
-					console.log(element);
+					player.x = element.x;
+					player.y = element.y;
 					updateQueue.push({ x: element.x, y: element.y, delay: Date.now() - data.time });
 
 				}
 				else {
-					// if(enemy == null){
 
 					enemy = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
-					// }
 
-					// else{
-					// enemy.newX = element.x;
-					// enemy.newY = element.y;
-
-
-
-					// }
 				}
 			});
 
-			// Step it 16ms + deltaTime
-			// Engine.update(engine, timing - oldTime);
-			// oldTime = timing;
-
-			// // Move physics body to position given on server
-			// // translation start is relative to body which is why
-			// // old.x - current.x
-
-			// Body.translate(playerBody, {
-			// 	x: player.x - playerBody.position.x,
-			// 	y: player.y - playerBody.position.y,
-			// });
-
-			// Body.applyForce(playerBody, { x: 0, y: 0 }, playerList.filter((element) => element.socketId === player.socketId)[0].vector);
-			if (updateQueue.length > 10) {
-				updateQueue = updateQueue.slice(1, 3);
-			}
 
 		}
 	});
@@ -332,31 +305,16 @@ function draw() {
 		screenDraw.drawGame(player.x, player.y, getScale(), ARENA_RADIUS);
 		screenDraw.drawObstacles(obstacles);
 
-		
-
 		player.draw();
-
-
 
 		// Math to make the pointer line in the player
 		let theta = Math.atan(player.direction.y / player.direction.x);
 		theta += player.direction.x < 0 ? Math.PI : 0;
-
-		// let x2 = Math.cos(theta) * player.r;
-		// let y2 = Math.sin(theta) * player.r;
-
-		// x2 += playerBody.position.x;
-		// y2 += playerBody.position.y;
-		// Body.applyForce(playerBody, { x: 0, y: 0 }, { x: x2, y: y2 });
-
-		// line(playerBody.position.x, playerBody.position.y, x2, y2);
 		line(player.x, player.y, player.x + Math.cos(theta) * player.r, player.y + Math.sin(theta) * player.r);
 
 		if (enemy != null) {
 			enemy.draw();
 		}
-
-
 
 		screenDraw.drawFPS(playerBody.position.x, playerBody.position.y, getScale());
 		screenDraw.drawBoostGauge(playerBody.position.x, playerBody.position.y, getScale());

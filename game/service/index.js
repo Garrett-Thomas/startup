@@ -390,9 +390,6 @@ function heartbeat() {
                 const { x, y } = playerBody.position;
                 player.x = x;
                 player.y = y;
-                if(index == 0){
-                console.log(playerBody.position)
-                }
                 if(Vector.magnitude(playerBody.velocity) > MAX_SPEED){
                     playerBody.velocity = Vector.mult(Vector.normalise(playerBody.velocity), MAX_SPEED);
                 }
