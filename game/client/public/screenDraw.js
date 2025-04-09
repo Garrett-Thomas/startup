@@ -30,7 +30,7 @@ class screenDraw {
 	}
 
 
-	static drawGameOver(msg) {
+	static drawGameOver(msg, playerX, playerY) {
 
 		push();
 		background(200);
@@ -39,7 +39,7 @@ class screenDraw {
 
 		textSize(20);
 		textAlign(CENTER, CENTER);
-		text(msg, 0, 0);
+		text(msg + "\nRedirecting to home page in a few seconds...", width / 2, height / 2);
 		pop();
 
 

@@ -202,7 +202,7 @@ function setup() {
 		gameOverMsg = data.msg;
 		clearInterval(gameStartTimerId);
 		setTimeout(() => {
-			window.location.href = "/"
+			window.location.replace("/");
 		}, 5000);
 
 	})
@@ -212,7 +212,7 @@ function setup() {
 		gameOverMsg = data.msg;
 
 		setTimeout(() => {
-			window.location.href = "/"
+			window.location.replace("/");
 		}, 5000);
 	});
 
@@ -292,7 +292,7 @@ function draw() {
 	}
 	if (state === gameState.GAME_OVER) {
 		// draw game over screen and put user back to index.html/
-		screenDraw.drawGameOver(gameOverMsg);
+		screenDraw.drawGameOver(gameOverMsg, player.x, player.y);
 	}
 
 	if (state === gameState.PLAYING && player !== null) {
