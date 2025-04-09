@@ -8,7 +8,7 @@ import "./Register.css";
 
 function Register() {
 
-    const { login, setAccountName} = useContext(AuthContext);
+    const { login, setAccountName } = useContext(AuthContext);
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
@@ -59,7 +59,7 @@ function Register() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-            debugger;
+        debugger;
 
         const errors = validateForm(formData);
         setFormErrors(errors);
@@ -97,12 +97,12 @@ function Register() {
     };
 
     return (
-        <div className="gradient-leaderboard vh-100">
+        <div className="gradient-leaderboard ">
             <Header />
             <ToastContainer />
             <div className="row justify-content-center align-items-start  w-100 m-0">
 
-                <form onSubmit={handleSubmit} className="max-width-login card bg-dark text-white mt-5 ">
+                <form onSubmit={handleSubmit} className="max-width-login card bg-dark text-white mt-5">
                     <div className="container-fluid " />
                     <div className="row">
                         <div className="col-5 p-5 w-100">

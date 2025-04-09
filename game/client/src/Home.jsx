@@ -68,13 +68,13 @@ function Home() {
 
 	function handleColorPick(e) {
 
-		if(e.target.value === selectedColor){
+		if (e.target.value === selectedColor) {
 
 			setSelectedColor(null);
 			localStorage.removeItem('selectedColor');
 		}
 
-		else{
+		else {
 
 			setSelectedColor(e.target.value);
 			localStorage.setItem('selectedColor', e.target.value);
@@ -123,28 +123,6 @@ function Home() {
 
 							</div>
 
-
-							{isAuthenticated ?
-								<>
-									<div className="row text-center">
-
-										<div className="col-10">
-
-											<div className="input-group mb-3">
-												<input type="text" maxLength={20} minLength={1} className="form-control text-center" placeholder="Enter join code to join a match" aria-label="Recipient's username" aria-describedby="button-addon2" />
-												<button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={() => alert("To be implemented")}>Join/Create</button>
-											</div>
-										</div>
-									</div>
-
-
-								</>
-								: <></>
-
-							}
-
-
-
 							{isAuthenticated && colorPallete.length > 0 ?
 
 
@@ -162,7 +140,7 @@ function Home() {
 											{colorPallete.map((color, index) => {
 
 
-												const elem = <button key={index} type="button"  className={"btn btn-secondar p-4" + (color === selectedColor ? " active " : "")} value={color} style={{ backgroundColor: color }} onClick={handleColorPick} />
+												const elem = <button key={index} type="button" className={"btn btn-secondar p-4" + (color === selectedColor ? " active " : "")} value={color} style={{ backgroundColor: color }} onClick={handleColorPick} />
 
 												return (
 
