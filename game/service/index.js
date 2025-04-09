@@ -381,10 +381,10 @@ function heartbeat() {
 
             value.players.forEach((player, index) => {
 
-                // if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
-                //     value.status = gameStatus.WON;
-                //     losers.push(player);
-                // }
+                if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
+                    value.status = gameStatus.WON;
+                    losers.push(player);
+                }
                 
                 const playerBody = playerBodies.get(player.socketId);
                 const { x, y } = playerBody.position;
