@@ -87,3 +87,6 @@ returns the country code based upon the ip address of the user.
 
 ## 🚀 DB deliverable
 - [x] **Stores data in MongoDB** - User credentials and data are stored in the database
+
+## 🚀 Web Socket deliverable
+- [x] **Game data over web socket** - All game data is coordinated over websockets at 60 times a second. This includes syncing the client state with the other client state and server state. 
