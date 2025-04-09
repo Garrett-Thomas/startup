@@ -12,8 +12,6 @@ import authRoute from './auth.js';
 
 import { addGameWon, addGamePlayed } from './dbUtils.js';
 
-
-// import fs from 'fs';
 /*
 Have a map structure that maps the "Game-ID" to the two players + physics engine
 Better experience only two players to a game.
@@ -49,7 +47,7 @@ const gameStatus = {
 
 const spawnOptions = [[[-1, 0], [1, 0]], [[0, 1], [0, -1]]];
 
-const startTime = 1000;
+const startTime = 3000;
 
 
 
@@ -381,10 +379,10 @@ function heartbeat() {
 
             value.players.forEach((player, index) => {
 
-                if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
-                    value.status = gameStatus.WON;
-                    losers.push(player);
-                }
+                // if (getMagnitude(player.x, player.y) > ARENA_RADIUS) {
+                //     value.status = gameStatus.WON;
+                //     losers.push(player);
+                // }
                 
                 const playerBody = playerBodies.get(player.socketId);
                 const { x, y } = playerBody.position;

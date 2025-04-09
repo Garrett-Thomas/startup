@@ -22,7 +22,9 @@ class screenDraw {
 		// ALlows for transparency
 		c.setAlpha(126);
 		textSize(20);
-		text("Waiting for player to join...", width / 2, height / 2);
+
+		textAlign(CENTER, CENTER);
+		text("Waiting for player to join...", playerX, playerY);
 		pop();
 
 	}
@@ -36,7 +38,8 @@ class screenDraw {
 
 
 		textSize(20);
-		text(msg, width / 2, height / 2);
+		textAlign(CENTER, CENTER);
+		text(msg, 0, 0);
 		pop();
 
 
@@ -73,7 +76,7 @@ class screenDraw {
 
 		push();
 
-	
+
 		push();
 		fill(200, 205, 180);
 
@@ -84,7 +87,7 @@ class screenDraw {
 
 		fill(233, 224, 201);
 		for (var i = 1; i < 4; i++) {
-			circle(0,0, (arenaSize * 2) / i);
+			circle(0, 0, (arenaSize * 2) / i);
 		}
 
 		pop();
@@ -112,12 +115,10 @@ class screenDraw {
 
 	static drawGameStart(time) {
 
-
-
 		push();
 		background(200);
 		textSize(20);
-
+		textAlign(CENTER, CENTER);
 		text(`Game starts in ${Math.floor(time / 1000) + 1}`, width / 2, height / 2);
 
 		pop();

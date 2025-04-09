@@ -316,8 +316,8 @@ function draw() {
 			enemy.draw();
 		}
 
-		screenDraw.drawFPS(playerBody.position.x, playerBody.position.y, getScale());
-		screenDraw.drawBoostGauge(playerBody.position.x, playerBody.position.y, getScale());
+		screenDraw.drawFPS(player.x, player.y, getScale());
+		screenDraw.drawBoostGauge(player.x, player.y, getScale());
 
 		// Responsible for managing when the player can boost
 		if (boosting) {
