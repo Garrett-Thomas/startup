@@ -2,11 +2,6 @@
     min-width: 300px;
 }
 
-.gradient-howtoplay {
-    min-height: 100vh;
-
-
-}
 
 .ff-verona {
     font-family: 'Verona'
@@ -48,6 +43,13 @@
     background-color: #f0edf287;
 }
 
+
+.gradient {
+    min-height: 100vh;
+    overflow: hidden;
+    padding-bottom: 10%;
+
+}
 .gradient-auth {
     background: linear-gradient(to right, rgba(106, 17, 203, 1), rgba(37, 117, 252, 1))
 }
@@ -56,15 +58,14 @@
     background: linear-gradient(to right, rgb(168, 98, 243), rgb(90, 146, 243));
 }
 
-.gradient {
-    min-height: 100vh;
-    overflow: hidden;
-    padding-bottom: 10%;
-
-}
-
 .gradient-leaderboard {
     background: linear-gradient(to right, rgb(81, 75, 249), rgb(140, 170, 221));
+}
+
+.gradient-howtoplay {
+
+    background: linear-gradient(to right, rgb(91, 56, 171), rgb(192, 123, 123));
+
 }
 
 .active {

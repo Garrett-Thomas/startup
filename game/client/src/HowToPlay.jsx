@@ -9,7 +9,7 @@ function HowToPlay() {
 
 
     return (
-        <div className="gradient-leaderboard vh-100">
+        <div className="gradient-howtoplay gradient">
             <Header />
 
             <div className="container text-center">
@@ -17,9 +17,9 @@ function HowToPlay() {
                     <div className="col">
                         <div className="d-flex justify-content-center p-5">
                             <div className="card border-primary min-width-card">
-                                <div className="card-body text-primary">
-                                    <h3 className="card-title">About</h3>
-                                    <p className="card-text">In <i>Sumo Game</i>, you control a <b>wrestler</b> inside an arena. Your goal is to <i>push</i> your opponent outside the arena before they do it to you!
+                                <div className="card-body">
+                                    <h3 className="card-title text-dark">About</h3>
+                                    <p className="card-text text-secondary">In <i>Sumo Game</i>, you control a <b>wrestler</b> inside an arena. Your goal is to <i>push</i> your opponent outside the arena before they do it to you!
                                         If you have an account, your <b>stats</b> will be recorded and you can choose your <i>wrestler's</i> color.</p>
                                 </div>
                             </div>
@@ -28,9 +28,9 @@ function HowToPlay() {
                     <div className="col">
                         <div className="d-flex justify-content-center p-5">
                             <div className="card border-primary min-width-card">
-                                <div className="card-body text-primary">
-                                    <h5 className="card-title">Controls</h5>
-                                    <p className="card-text">Use your <b>mouse</b> to orient and move your <i>sumo</i> wrestler. Your <i>wrestler</i> will have a <b>line</b> indicating to where its being pointed. Use the space bar to give your wrestler some extra <b>speed!</b></p>
+                                <div className="card-body">
+                                    <h5 className="card-title text-dark">Controls</h5>
+                                    <p className="card-text text-secondary">Use your <b>mouse</b> to orient and move your <i>sumo</i> wrestler. Your <i>wrestler</i> will have a <b>line</b> indicating to where its being pointed. Use the space bar to give your wrestler some extra <b>speed!</b></p>
                                 </div>
                             </div>
                         </div>
