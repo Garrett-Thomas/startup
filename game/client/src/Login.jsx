@@ -5,7 +5,7 @@ import { AuthContext } from "./context/auth";
 import React, { useState, useContext, useEffect } from "react";
 import {ToastContainer, toast} from 'react-toastify';
 import { useNavigate } from "react-router-dom";
-
+import "./App.css";
 
 
 function Login() {
@@ -86,7 +86,7 @@ function Login() {
 
 
     return (
-        <div className="gradient-leaderboard vh-100">
+        <div className="gradient-auth vh-100">
         <Header />
       
             <ToastContainer />

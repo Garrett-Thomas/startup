@@ -1,4 +1,4 @@
-class Tank {
+export class Sumo {
     constructor(x, y, r, id = -1, name = "", gameId, pColor) {
         this.x = x;
         this.y = y;

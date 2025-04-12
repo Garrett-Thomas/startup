@@ -44,6 +44,11 @@ function Header() {
                         <li className="nav-item m-2">
                             <Link className="btn btn-outline-secondary col" to="/leaderboard">Leaderboard</Link>
                         </li>
+
+                        <li className="nav-item m-2">
+                            <Link className="btn btn-outline-secondary col" to="/howtoplay">How To Play</Link>
+                        </li>
+
                     </ul>
 
                 </div>

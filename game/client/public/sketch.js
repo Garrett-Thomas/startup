@@ -2,6 +2,9 @@ const UPDATE_TIME = 1000 / 60;
 const DEFAULT_TEXT_SIZE = 20;
 
 let { Engine, Bodies, Body, World } = Matter;
+
+import { Sumo } from "./player.js";
+
 let socket;
 let ARENA_RADIUS;
 let player = null;
@@ -150,7 +153,7 @@ function getPlayerData() {
 		console.log(data.player.color);
 		engine = Engine.create(data.WORLD_OPTIONS);
 		world = engine.world;
-		player = new Tank(data.player.x, data.player.y, data.player.r, data.player.socketId, data.player.name, data.player.gameId, data.player.color);
+		player = new Sumo(data.player.x, data.player.y, data.player.r, data.player.socketId, data.player.name, data.player.gameId, data.player.color);
 
 		playerBody = Bodies.circle(data.player.x, data.player.y, data.player.r, data.PLAYER_OPTIONS);
 		obstacles = data.obstacles;
@@ -236,7 +239,7 @@ function setup() {
 
 				if (element.socketId === player.socketId) {
 
-					// player = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
+					// player = new Sumo(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
 					player.x = element.x;
 					player.y = element.y;
 					updateQueue.push({ x: element.x, y: element.y, delay: Date.now() - data.time });
@@ -244,7 +247,7 @@ function setup() {
 				}
 				else {
 
-					enemy = new Tank(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
+					enemy = new Sumo(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
 
 				}
 			});
@@ -340,9 +343,7 @@ function draw() {
 				}, BOOST_RECOVERY_TIME);
 			}
 		}
-
 		// Boost amount is scaled, but not proportional to mass
-
-
+		randomFunctionClaled();
 	}
 }

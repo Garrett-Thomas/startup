@@ -5,4 +5,4 @@ test/
 node_modules/
 package-lock.json
 db.json
-build/
+build/eslint.config.js

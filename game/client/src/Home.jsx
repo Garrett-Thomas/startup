@@ -95,7 +95,7 @@ function Home() {
 
 
 	return (
-		<div className="gradient-home vh-100">
+		<div className="gradient-home gradient">
 			<Header />
 			<main>
 				<div className="mt-5 container-fluid">

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import Footer from "./components/Footer";
-
 import Header from "./components/Header";
 import Loading from "./components/Loading";
 import Error from "./components/Error";
-import "./Register.css";
+import "./App.css";
+
 function Leaderboard() {
 
 
@@ -13,7 +13,6 @@ function Leaderboard() {
     const [error, setError] = useState(false);
 
     useEffect(() => {
-
         const fetchLeaderboardData = async () => {
             try {
 
@@ -35,7 +34,7 @@ function Leaderboard() {
 
     if (loading) {
         return (
-            <div className="gradient-leaderboard vh-100">
+            <div className="gradient-leaderboard gradient">
                 <Header />
 
                 <div className="row  align-items-start  w-100 m-0">
@@ -47,7 +46,7 @@ function Leaderboard() {
     }
     if (error) {
         return (
-            <div className="gradient-leaderboard vh-100">
+            <div className="gradient-leaderboard gradient">
                 <Header />
 
                 <div className="row  align-items-start w-100 m-0">
@@ -59,7 +58,7 @@ function Leaderboard() {
     }
 
     return (
-        <div className="gradient-leaderboard ">
+        <div className="gradient-leaderboard gradient">
             <Header />
             <div className="row  align-items-start  w-100 m-0">
                 <div className=" max-min-width-leaderboard container text-center card mt-5 mb-10">
