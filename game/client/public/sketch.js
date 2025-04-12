@@ -3,8 +3,6 @@ const DEFAULT_TEXT_SIZE = 20;
 
 let { Engine, Bodies, Body, World } = Matter;
 
-import { Sumo } from "./player.js";
-
 let socket;
 let ARENA_RADIUS;
 let player = null;
@@ -343,7 +341,5 @@ function draw() {
 				}, BOOST_RECOVERY_TIME);
 			}
 		}
-		// Boost amount is scaled, but not proportional to mass
-		randomFunctionClaled();
 	}
 }
