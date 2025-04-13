@@ -68,6 +68,9 @@ return user;
 
 
 }
+
+
+// Throws error if invalid
 function verifyAndDecodeToken(token) {
 
       const decoded = jwt.verify(token, jwtSecret); // Verify the token

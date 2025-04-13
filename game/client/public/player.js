@@ -1,19 +1,14 @@
 class Sumo {
-    constructor(x, y, r, id = -1, name = "", gameId, pColor) {
-        this.x = x;
-        this.y = y;
+    constructor(pos, r, id = -1, name = "", gameID, pColor) {
+        this.position = pos;
         this.r = r;
-        this.socketId = id;
-        this.gameId = gameId;
+        this.socketID = id;
+        this.gameID = gameID;
         this.mass = this.r / 3;
         this.scale = 1;
         this.name = name;
         this.pColor = color(pColor);
         this.direction = createVector(0, 0);
-        this.newX = x;
-        this.newY = y;
-        this.currCompensation = 0.5;
-        this.oldCompensation = 1;
     }
 
     getDirection() {
@@ -31,7 +26,7 @@ class Sumo {
         push();
 
         fill(this.pColor);
-        ellipse(this.x, this.y, this.r * 2);
+        ellipse(this.position.x, this.position.y, this.r * 2);
         push();
         fill(20, 20, 20)
 
@@ -39,7 +34,7 @@ class Sumo {
         fill(20, 20, 20);
         textSize(this.r);
         textAlign(CENTER);
-        text(this.name, this.x, this.y + this.r * 2);
+        text(this.name, this.position.x, this.position.y + this.r * 2);
         pop();
     }
 }

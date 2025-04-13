@@ -4,36 +4,17 @@ const CONSTANTS = {
     "HEARTBEAT_TIME": 1000 / 60,
     "DEFAULT_RADIUS": 100,
     "PLAYER_TIMEOUT": 1000,
+    "JOIN_WAIT_TIME":1000,
     "OBSTACLE_RADIUS": 200,
     "MAX_SPEED": 15,
+
     "GAME_STATUS": {
         "WAITING": "waiting",
         "PLAYING": "playing",
         "WON": "won",
         "GAME_START": "game_start"
     },
-    "SPAWN_OPTIONS": [
-        [
-            [
-                -1,
-                0
-            ],
-            [
-                1,
-                0
-            ]
-        ],
-        [
-            [
-                0,
-                1
-            ],
-            [
-                0,
-                -1
-            ]
-        ]
-    ],
+    "SPAWN_OPTIONS": [[[-1, 0], [1, 0]], [[0, 1], [0, -1]]],
     "START_TIME": 3000,
     "PLAYER_OPTIONS": {
         "friction": 0,
@@ -57,4 +38,3 @@ const CONSTANTS = {
 }
 
 export default CONSTANTS;
-

@@ -69,17 +69,11 @@ class screenDraw {
 		scale(scle);
 
 		// This ensures that (0, 0) is as far away from the player as possible	
-
 		translate(-playerX, -playerY);
-
-
-
 		push();
-
 
 		push();
 		fill(200, 205, 180);
-
 
 		const blockWidth = (arenaSize * 2.5);
 		square(-blockWidth / 2, -blockWidth / 2, blockWidth, arenaSize / 5);
@@ -125,10 +119,10 @@ class screenDraw {
 	}
 
 	static drawFPS(playerX, playerY, scale) {
+		// scale = 1 / player.r;
 		textSize(DEFAULT_TEXT_SIZE / scale);
 		push();
 		fill(102, 255, 0);
-
 		text(
 			Math.round(frameRate()),
 			playerX - (width / 2 - 10) / scale,

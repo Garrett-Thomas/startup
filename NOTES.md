@@ -1,16 +1,11 @@
 ## Game
-- 2 players per game, hashmap in the backend mapping gameid to to game engine
 
+- Should step engine by delta time
 
-- Want to revert back to simulation running on client side w/ delta time
+- On a join event, players should just be put into a queue until there are two or more people waiting. I then send them a "room code" and they both join that game. Then I could
+easily implement a custom room code that you could use to play others.
 
-- Client -> delay -> server -> client
-
-- If I use prediction on the client then get the update from the server, the info will
-be ~20-100ms old.
-
-- I should just send all information to the server then render what I get back. Some packets
-will be lost but should just lerp if no update
+- Then for game management I have a hashmap that has a ROOM_ID -> GAME_DATA that stores everything
 
 ## LOG
 

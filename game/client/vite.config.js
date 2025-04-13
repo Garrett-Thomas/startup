@@ -11,4 +11,7 @@ export default defineConfig({
       },
     },
   },
+  optimizeDeps: {
+    exclude: ['vue-demi', '@vite/client', '@vite/env'],
+  }
 });

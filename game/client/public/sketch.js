@@ -6,7 +6,7 @@ let { Engine, Bodies, Body, World } = Matter;
 let socket;
 let ARENA_RADIUS;
 let player = null;
-let enemy = null;
+let enemies = new Map();
 
 let boosting = false;
 let canBoost = true;
@@ -53,17 +53,14 @@ setInterval(() => {
 
 		let boostSpeed = boosting ? BOOST_AMOUNT / getScale() : 1;
 		let p = {
-			x: player.x,
-			y: player.y,
+			position: player.position,
 			r: player.r,
 			vector: {
 				x: player.direction.x * boostSpeed,
 				y: player.direction.y * boostSpeed,
 			},
-			gameId: player.gameId,
+			gameID: player.gameID,
 		};
-
-		delay = Date.now() - delay;
 
 		socket.emit("update", p);
 	}
@@ -72,7 +69,6 @@ setInterval(() => {
 
 
 function reset() {
-	World.clear(world, true);
 	playerBody = null;
 	socket = null;
 	timer = null;
@@ -96,18 +92,12 @@ function getWidthHeight() {
 
 function windowResized() {
 	let { canvW, canvH } = getWidthHeight();
-
 	let aspectRatio = canvW / canvH;
-
 	if (aspectRatio != width / height) {
-
 		resizeCanvas(800, 800 * (1 / aspectRatio));
-
 	}
-
 	canvas.style.width = canvW + "px";
 	canvas.style.height = canvH + "px";
-
 }
 
 document.addEventListener("keydown", () => {
@@ -136,6 +126,7 @@ window.addEventListener('beforeunload', (event) => {
 function getScale() {
 	// TODO: Replace 50 w/ a const from server
 
+	// return 1;
 	return ((30 / player.r));
 }
 
@@ -148,23 +139,21 @@ function sendPlayerData(name) {
 function getPlayerData() {
 
 	socket.once("init_data", (data) => {
-		console.log(data.player.color);
-		engine = Engine.create(data.WORLD_OPTIONS);
-		world = engine.world;
-		player = new Sumo(data.player.x, data.player.y, data.player.r, data.player.socketId, data.player.name, data.player.gameId, data.player.color);
-
-		playerBody = Bodies.circle(data.player.x, data.player.y, data.player.r, data.PLAYER_OPTIONS);
 		obstacles = data.obstacles;
+		for (const wrestler of data.players) {
 
-		for (const ob of data.obstacles) {
-			World.add(world, Bodies.circle(ob.x, ob.y, ob.r, data.OBSTACLE_OPTIONS));
+			if (wrestler.socketID == socket.id) {
+				player = new Sumo(wrestler.position, data.DEFAULT_RADIUS, wrestler.socketID, wrestler.name, data.gameID, wrestler.color);
+			}
+			else {
+				enemies.set(wrestler.socketID, new Sumo(wrestler.position, data.DEFAULT_RADIUS, wrestler.socketID, wrestler.name, data.gameID, wrestler.color));
+			}
 		}
 
-		World.add(world, playerBody);
 		ARENA_RADIUS = data.ARENA_RADIUS;
-
 		state = gameState.WAITING;
 		loop();
+
 	});
 
 }
@@ -219,39 +208,30 @@ function setup() {
 
 	socket.on("heartbeat", (data) => {
 
-		delay = Date.now();
+		const playerBodies = data.players;
+
+		playerBodies.forEach((body) => {
+
+			debugger;
+
+			if (body.socketID === socket.id) {
+				player.position = body.position
+			}
+
+			else 
+			
+			{
 
 
+				// TODO: This needs to change if multiple enemies
+				const enemy = enemies.get(body.socketID);
+				enemy.position = body.position;
 
-		const playerList = data.players;
-		// let timing = data.timing;
+			}
 
-		if (player != null && world != null) {
-			playerList.forEach((element) => {
-
-
-				// This causes a lot of jerkiness. Need to find a way to really just lerp it.
-				// Maybe the update data should be stored in an object attribute and I just continously lerp towards
-				// it with an exponential decay function so that smaller steps are taken as the object gets closer.
-				// This would remove a lot of jitter but would allow the client to be updated reasonably if big jumps are necessary
-
-				if (element.socketId === player.socketId) {
-
-					// player = new Sumo(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
-					player.x = element.x;
-					player.y = element.y;
-					updateQueue.push({ x: element.x, y: element.y, delay: Date.now() - data.time });
-
-				}
-				else {
-
-					enemy = new Sumo(element.x, element.y, element.r, element.socketId, element.name, element.gameId, element.color);
-
-				}
-			});
+		});
 
 
-		}
 	});
 
 	let name = localStorage.getItem("playerName");
@@ -260,9 +240,9 @@ function setup() {
 
 	}
 	else {
+		state === gameState.WAITING;
 		sendPlayerData(name);
 		getPlayerData();
-
 		frameRate(60);
 
 	}
@@ -272,23 +252,20 @@ function setup() {
 // View of world should remain the same regardless of screen size
 
 function draw() {
-	if (state === gameState.GAME_START_DISCONNECT) {
-		screenDraw.drawGameOver(gameOverMsg);
+	// if (state === gameState.GAME_START_DISCONNECT) {
+	// 	screenDraw.drawGameOver(gameOverMsg);
 
-	}
+	// }
 	if (state === gameState.WAITING) {
 		// draw waiting screen
 		screenDraw.drawWaitScreen(width / 2, height / 2);
 		socket.emit('ping', { msg: state });
 
 	}
-
 	if (state === gameState.GAME_START) {
 		// draw game start screen
 
-		socket.emit('ping', { msg: state });
 		screenDraw.drawGameStart(gameStartTime - Date.now());
-
 
 	}
 	if (state === gameState.GAME_OVER) {
@@ -298,27 +275,33 @@ function draw() {
 
 	if (state === gameState.PLAYING && player !== null) {
 
-		// screenDraw.drawGame(playerBody.position.x, playerBody.position.y, getScale(), ARENA_RADIUS);
+
 		let x = mouseX;
 		let y = mouseY;
 
+		const playerX = player.position.x;
+		const playerY = player.position.y;
+
 		player.update(createVector(x - width / 2, y - height / 2));
-		screenDraw.drawGame(player.x, player.y, getScale(), ARENA_RADIUS);
+
+		screenDraw.drawGame(playerX, playerY, getScale(), ARENA_RADIUS);
 		screenDraw.drawObstacles(obstacles);
 
 		player.draw();
-
 		// Math to make the pointer line in the player
 		let theta = Math.atan(player.direction.y / player.direction.x);
-		theta += player.direction.x < 0 ? Math.PI : 0;
-		line(player.x, player.y, player.x + Math.cos(theta) * player.r, player.y + Math.sin(theta) * player.r);
 
-		if (enemy != null) {
+		theta += player.direction.x < 0 ? Math.PI : 0;
+
+		line(playerX, playerY, playerX + Math.cos(theta) * player.r, playerY + Math.sin(theta) * player.r);
+
+
+		for (const enemy of enemies.values()) {
 			enemy.draw();
 		}
 
-		screenDraw.drawFPS(player.x, player.y, getScale());
-		screenDraw.drawBoostGauge(player.x, player.y, getScale());
+		screenDraw.drawFPS(playerX, playerY, getScale());
+		screenDraw.drawBoostGauge(playerX, playerY, getScale());
 
 		// Responsible for managing when the player can boost
 		if (boosting) {

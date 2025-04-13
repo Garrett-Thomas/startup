@@ -6,7 +6,7 @@ const server = http.createServer(app);
 import leaderBoardRoute from './leaderboard.js';
 import authRoute from './auth.js';
 
-import Game from "./game.js";
+import Game from "./refactored_game.js";
 import { addGameWon, addGamePlayed } from './dbUtils.js';
 
 /*

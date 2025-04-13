@@ -317,7 +317,7 @@ class Game {
     // TYPE: SocketID string
     deletePlayer(socketId) {
 
-        let game = this.gameIDToGame.get(this.sockToGame.get(socketId))
+        let game = this.gameIDToGame.get(sockToGame.get(socketId))
         game.players = game.players.filter((player) => player.socketId != socketId);
 
         try {
@@ -386,7 +386,7 @@ class Game {
                     player.x = x;
                     player.y = y;
                     if (Vector.magnitude(playerBody.velocity) > CONSTANTS.MAX_SPEED) {
-                        playerBody.velocity = Vector.mult(Vector.normalise(playerBody.velocity), CONSTANTS.MAX_SPEED);
+                        playerBody.velocity = Vector.mult(Vector.normalise(playerBody.velocity), MAX_SPEED);
                     }
 
                 });
