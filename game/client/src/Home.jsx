@@ -66,6 +66,13 @@ function Home() {
 
 	}
 
+
+	function handleCustomMatch(e) {
+		console.log(e.target.value);
+		localStorage.setItem('roomName', e.target.value);
+	}
+
+
 	function handleColorPick(e) {
 
 		if (e.target.value === selectedColor) {
@@ -88,6 +95,10 @@ function Home() {
 			playerName !== "" &&
 			playerName.length <= 20
 		) {
+			if (localStorage.getItem("roomName") == "") {
+				localStorage.removeItem("roomName");
+			}
+
 			localStorage.setItem("playerName", playerName);
 			document.location.href = "/game.html";
 		}
@@ -122,7 +133,24 @@ function Home() {
 								</div>
 
 							</div>
+							{isAuthenticated ?
+								<>
+									<div className="row text-center">
 
+										<div className="col-10">
+
+											<div className="input-group mb-3">
+												<input type="text" maxLength={20} minLength={1} className="form-control text-center" placeholder="Enter join code to join a match" aria-label="Recipient's username" aria-describedby="button-addon2" onChange={handleCustomMatch} />
+												<button className="btn btn-outline-secondary" type="button" id="button-addon2" onClick={submit}>Join/Create</button>
+											</div>
+										</div>
+									</div>
+
+
+								</>
+								: <></>
+
+							}
 							{isAuthenticated && colorPallete.length > 0 ?
 
 

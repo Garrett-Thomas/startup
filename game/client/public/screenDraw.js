@@ -30,7 +30,7 @@ class screenDraw {
 	}
 
 
-	static drawGameOver(msg, playerX, playerY) {
+	static drawGameOver(msg) {
 
 		push();
 		background(200);

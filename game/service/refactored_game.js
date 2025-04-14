@@ -2,7 +2,7 @@ import { Server } from 'socket.io';
 import CONSTANTS from './constants.js';
 import Matter from 'matter-js';
 
-// import { verifyAndDecodeToken } from './dbUtils.js';
+import { addGameWon, addGamePlayed, verifyAndDecodeToken } from './dbUtils.js';
 
 const { Engine, Bodies, Body, World, Vector } = Matter;
 import { v4 as uuidv4 } from 'uuid';
@@ -19,6 +19,8 @@ class Game {
 
 
     joinQueue = [];
+    customGameQueue = [];
+
     roomIDToGameData = new Map();
     constructor(server) {
         this.io = new Server(server, {
@@ -31,6 +33,19 @@ class Game {
         setInterval(() => this.gameStep(), CONSTANTS.HEARTBEAT_TIME);
 
     }
+
+
+
+    // Stolen off internet
+    simpleHash(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = (hash << 5) - hash + char;
+        }
+        // Convert to 32bit unsigned integer in base 36 and pad with "0" to ensure length is 7.
+        return (hash >>> 0).toString(36).padStart(7, '0');
+    };
 
 
     handlerSetup() {
@@ -52,7 +67,6 @@ class Game {
                             throw new Error(`No player exists in this game with ID: ${socket.id}`);
                         }
 
-                        console.log(data.vector);
                         Body.applyForce(playerBody, { x: 0, y: 0 }, data.vector);
                     }
 
@@ -69,13 +83,29 @@ class Game {
                     return;
                 }
 
-                const initData = { socket: socket, token: data.token, name: data.playerName, color: data.color };
-
+                const initData = { socket: socket, token: data.token, name: data.playerName, color: data.color, roomName: data.roomName };
 
 
                 // handle case where user has put custom room name
                 if (data.roomName) {
 
+
+                    for (let i = this.customGameQueue.length - 1; i >= 0; i--) {
+
+                        if (!this.customGameQueue[i].socket.connected) {
+                            this.customGameQueue.splice(i, 1);
+                        }
+                        if (this.customGameQueue[i].roomName == data.roomName) {
+                            const gameID = this.simpleHash(data.roomName);
+                            this.handleTwoGameStart(gameID, this.customGameQueue[i], initData);
+                            this.customGameQueue.splice(i, 1);
+                            return;
+                        }
+
+                    }
+
+                    this.customGameQueue.push(initData);
+                    return;
                 }
 
                 // We can pair them with a person in the queue
@@ -83,22 +113,9 @@ class Game {
                 if (this.joinQueue.length > 0) {
 
                     if (this.joinQueue[0].socket.connected) {
-
                         const player1 = this.joinQueue.shift();
                         const gameID = uuidv4()
-                        setTimeout(() => {
-                            this.setupTwoUsers(gameID, player1, initData);
-
-                            // Have both players join same room
-                            player1.socket.join(gameID);
-                            socket.join(gameID);
-
-                            this.sendPlayerInitData(gameID);
-                            this.sendRoomStartTime(gameID, Date.now() + CONSTANTS.START_TIME);
-
-
-                        }, CONSTANTS.JOIN_WAIT_TIME);
-
+                        this.handleTwoGameStart(gameID, player1, initData);
                     }
 
                     // if its not connected anymore we can just get rid of it
@@ -122,6 +139,21 @@ class Game {
 
     }
 
+    handleTwoGameStart(gameID, player1, player2) {
+        setTimeout(() => {
+            this.setupTwoUsers(gameID, player1, player2);
+
+            // Have both players join same room
+            player1.socket.join(gameID);
+            player2.socket.join(gameID);
+
+            this.sendPlayerInitData(gameID);
+            this.sendRoomStartTime(gameID, Date.now() + CONSTANTS.START_TIME);
+
+
+        }, CONSTANTS.JOIN_WAIT_TIME);
+
+    }
     // create a game using map that maps gameID to gameobject
     setupTwoUsers(gameID, player1, player2) {
 
@@ -136,16 +168,31 @@ class Game {
             engine: engine,
             client_bodies: [],
             physics_bodies: new Map(),
+            idToToken: new Map(),
             obstacles: [],
             status: CONSTANTS.GAME_STATUS.WAITING,
-            lastTime: -1
+            numPlayers: 2
         }
 
         let players = [player1, player2];
 
         players.forEach(player => {
 
+
+
+            try {
+
+                if (player.token) {
+                    verifyAndDecodeToken(player.token);
+
+                    gameObject.idToToken.set(player.socket.id, player.token);
+                }
+            } catch (err) {
+                console.error(`Could not decode token: ${err}`);
+            }
+
             let selectedLocation;
+
             if (randLoc.length > 1) {
                 selectedLocation = spwn[randLoc];
 
@@ -223,31 +270,66 @@ class Game {
     // Iterate over the games, step by delta time, figure out who lost, send updated info to client 
     heartbeat() {
 
+
+
+
+
+
+
         for (const [gameID, gameObject] of this.roomIDToGameData.entries()) {
-
-
-
             // If not playing then assuming it will be cleaned up somewhere else
             if (gameObject.status != CONSTANTS.GAME_STATUS.PLAYING) {
                 continue;
             }
 
             Engine.update(gameObject.engine, gameObject.engine.deltaTime);
+
+
+            let isGameOver = false;
             for (const [socketID, playerBody] of gameObject.physics_bodies.entries()) {
                 // Limit highest speed
 
-
                 if (Body.getSpeed(playerBody) > CONSTANTS.MAX_SPEED) {
-
                     Body.setSpeed(playerBody, CONSTANTS.MAX_SPEED);
                 }
 
-                // End game if player out of bounds
-                // if (Vector.magnitude(playerBody.position) > CONSTANTS.ARENA_RADIUS) {
 
-                //     endGame(gameID, playerBody.socketId);
-                //     continue;
-                // }
+
+                // End game if two players and out of bounds
+
+
+                // Disconnect player if out of bounds
+                if (Vector.magnitude(playerBody.position) > CONSTANTS.ARENA_RADIUS) {
+                    // Should convert client_bodies to a map for faster lookup 
+
+                    const loserID = gameObject.client_bodies.find((player) => player.socketID == socketID).socketID;
+                    if (gameObject.numPlayers <= 2) {
+                        const winnerID = gameObject.client_bodies.find((player) => player.socketID != socketID).socketID;
+
+                        const loserToken = gameObject.idToToken.get(loserID);
+                        const winnerToken = gameObject.idToToken.get(winnerID);
+
+
+                        try {
+                            if (loserToken) {
+                                addGamePlayed(loserToken);
+                            }
+                            if (winnerToken) {
+                                addGameWon(winnerToken);
+                                addGamePlayed(winnerToken);
+                            }
+
+                        }
+                        catch (err) {
+                            console.error(`Error on updating player stats: ${err}`);
+                        }
+
+                        this.endGame(gameID, loserID);
+
+                        isGameOver = true;
+                        break;
+                    }
+                }
 
                 for (const clientBody of gameObject.client_bodies) {
 
@@ -256,25 +338,21 @@ class Game {
                     }
                 }
             }
+            if (!isGameOver) {
 
-            this.io.to(gameID).emit("heartbeat", this.getUpdateDataFromRoomID(gameID));
+                this.io.to(gameID).emit("heartbeat", this.getUpdateDataFromRoomID(gameID));
+            }
         }
     }
 
-
-
     // Assume that client can handle figuring out if they lost or not
     endGame(gameID, loserSocketID) {
-        this.io.to(gameID).emit("game_over", { loser: loserSocketID });
+        this.io.to(gameID).emit("game_end", { loserID: loserSocketID });
         this.roomIDToGameData.delete(gameID);
 
     }
-
-
     // This function runs a single "game step"
     gameStep() {
-
-
         /*
         1. Award winners as needed
         2. Delete Games & Players as needed

@@ -133,7 +133,7 @@ function getScale() {
 function sendPlayerData(name) {
 
 	const color = localStorage.getItem('selectedColor') ? localStorage.getItem('selectedColor') : DEFAULT_COLOR
-	socket.emit("join", { playerName: name, color: color, token: localStorage.getItem('token') });
+	socket.emit("join", { playerName: name, color: color, token: localStorage.getItem('token'), roomName: localStorage.getItem("roomName") });
 }
 
 function getPlayerData() {
@@ -199,7 +199,12 @@ function setup() {
 	socket.once("game_end", (data) => {
 
 		state = gameState.GAME_OVER;
-		gameOverMsg = data.msg;
+
+		gameOverMsg = "You won";
+
+		if (socket.id == data.loserID) {
+			gameOverMsg = "You lost";
+		}
 
 		setTimeout(() => {
 			window.location.replace("/");
@@ -218,12 +223,7 @@ function setup() {
 				player.position = body.position
 			}
 
-			else 
-			
-			{
-
-
-				// TODO: This needs to change if multiple enemies
+			else {
 				const enemy = enemies.get(body.socketID);
 				enemy.position = body.position;
 
@@ -270,7 +270,7 @@ function draw() {
 	}
 	if (state === gameState.GAME_OVER) {
 		// draw game over screen and put user back to index.html/
-		screenDraw.drawGameOver(gameOverMsg, player.x, player.y);
+		screenDraw.drawGameOver(gameOverMsg);
 	}
 
 	if (state === gameState.PLAYING && player !== null) {
