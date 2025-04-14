@@ -1,7 +1,7 @@
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { AuthContext } from "./context/auth";
-
+import { ToastContainer, toast } from "react-toastify";
 import React, { useState, useContext, useEffect, useRef } from "react";
 
 function Home() {
@@ -92,23 +92,25 @@ function Home() {
 
 		if (
 			(e.code === "Enter" || e.type === "click") &&
-			playerName !== "" &&
-			playerName.length <= 20
+			playerName == "" ||
+			playerName.length > 20
 		) {
-			debugger;
-			if (!isAuthenticated || localStorage.getItem("roomName") == "") {
-				localStorage.removeItem("roomName");
-			}
-
-			localStorage.setItem("playerName", playerName);
-			document.location.href = "/game.html";
+			toast("Please enter a name no longer than 20 characters");
+			return;
 		}
+		if (!isAuthenticated || localStorage.getItem("roomName") == "") {
+			localStorage.removeItem("roomName");
+		}
+
+		localStorage.setItem("playerName", playerName);
+		document.location.href = "/game.html";
 	}
 
 
 	return (
 		<div className="gradient-home gradient">
 			<Header />
+			<ToastContainer />
 			<main>
 				<div className="mt-5 container-fluid">
 

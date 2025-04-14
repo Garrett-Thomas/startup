@@ -57,12 +57,12 @@ async function getUserByEmail(email){
 async function loginUser(email, password){
 
 const user = await userCollection.findOne({email: email});
-// const passwdHash = await bcyrpt.hash(password, 10);
 
+if(user == null) return null;
 
-if(user == null || !areSamePassword) return null;
 const areSamePassword = await bcyrpt.compare(password, user.password);
 
+if(!areSamePassword) return null;
 
 return user;
 
