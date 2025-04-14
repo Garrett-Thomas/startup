@@ -31,10 +31,10 @@ check('password_two', "Passwords must match").custom((password_two, { req }) => 
         }
         catch (err) {
             if (err.cause == "duplicate") {
-                return res.status(400).json({ msg: err.message });
+                return res.status(400).json({ msg: "Already an account registered with the provided email"});
             }
 
-            return res.status(500).json({ msg: err.message });
+            return res.status(500).json({ msg: "Internal Error"});
         }
     });
 
@@ -58,7 +58,7 @@ check('password', 'Password is required').notEmpty()], async (req, res) => {
 
     }
     catch (err) {
-        return res.status(500).json({ msg: err.message });
+        return res.status(500).json({ msg: "Internal Error" });
     }
 
 
@@ -87,7 +87,7 @@ router.get('/user-data', [check('token', 'JWT is required').notEmpty()], async (
     }
     catch (err) {
         console.error(err);
-        return res.status(500).json({ msg: err.message });
+        return res.status(500).json({ msg: "Internal Error" });
     }
 
 
