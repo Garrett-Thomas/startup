@@ -41,7 +41,7 @@ function getLeaderboard(){
 function generateJWT(payload){
 
 
-return jwt.sign(payload, jwtSecret, {expiresIn: 3600});
+return jwt.sign(payload, jwtSecret, {expiresIn: 3600000});
 
 }
 
@@ -60,8 +60,8 @@ const user = await userCollection.findOne({email: email});
 // const passwdHash = await bcyrpt.hash(password, 10);
 
 
-const areSamePassword = await bcyrpt.compare(password, user.password);
 if(user == null || !areSamePassword) return null;
+const areSamePassword = await bcyrpt.compare(password, user.password);
 
 
 return user;

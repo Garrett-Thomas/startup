@@ -2,20 +2,16 @@ class screenDraw {
 
 
 
-	static drawWaitScreen(playerX, playerY) {
+	static drawWaitScreen(x,y) {
 		push();
 
 		background(200);
 		// Ensures that the dimensions will always be a seventh of the canvas width
 		let leaderDimensions = width * (1 / 7);
-		leaderDimensions /= scale;
 
 		// Want x and y to be relative to player position and position away from the
 		// screen a scaled 10 pixels
-		let x =
-			playerX +
-			(width / 2 - (leaderDimensions * scale + 10)) / getScale();
-		let y = playerY - (height / 2 - 10) / scale;
+
 
 		let c = color(52);
 
@@ -24,7 +20,7 @@ class screenDraw {
 		textSize(20);
 
 		textAlign(CENTER, CENTER);
-		text("Waiting for player to join...", playerX, playerY);
+		text("Waiting for player to join...", x, y);
 		pop();
 
 	}

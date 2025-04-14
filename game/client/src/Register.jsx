@@ -97,7 +97,7 @@ function Register() {
     };
 
     return (
-        <div className="gradient-auth gradient pb-0 mb-0">
+        <div className="gradient-auth gradient pb-5 mb-0">
             <Header />
             <ToastContainer />
             <div className="row justify-content-center align-items-start w-100 m-0">

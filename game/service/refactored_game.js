@@ -94,6 +94,7 @@ class Game {
 
                         if (!this.customGameQueue[i].socket.connected) {
                             this.customGameQueue.splice(i, 1);
+                            break;
                         }
                         if (this.customGameQueue[i].roomName == data.roomName) {
                             const gameID = this.simpleHash(data.roomName);

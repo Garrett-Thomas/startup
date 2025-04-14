@@ -38,7 +38,7 @@ let gameState = {
 	GAME_START_DISCONNECT: "game_start_disconnect"
 }
 
-let state = null;
+let state = gameState.WAITING;
 let gameOverMsg = "";
 let obstacles = null;
 
@@ -259,7 +259,6 @@ function draw() {
 	if (state === gameState.WAITING) {
 		// draw waiting screen
 		screenDraw.drawWaitScreen(width / 2, height / 2);
-		socket.emit('ping', { msg: state });
 
 	}
 	if (state === gameState.GAME_START) {

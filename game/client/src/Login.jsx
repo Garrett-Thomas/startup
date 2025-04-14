@@ -86,7 +86,7 @@ function Login() {
 
 
     return (
-        <div className="gradient-auth vh-100">
+        <div className="gradient-auth gradient pb-5">
         <Header />
       
             <ToastContainer />

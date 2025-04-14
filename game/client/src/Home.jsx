@@ -95,7 +95,8 @@ function Home() {
 			playerName !== "" &&
 			playerName.length <= 20
 		) {
-			if (localStorage.getItem("roomName") == "") {
+			debugger;
+			if (!isAuthenticated || localStorage.getItem("roomName") == "") {
 				localStorage.removeItem("roomName");
 			}
 
