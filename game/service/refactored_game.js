@@ -78,9 +78,9 @@ class Game {
 
             socket.once("join", (data) => {
 
-                if (!data.playerName || !data.color) {
+                if (!data.playerName || !data.color || data.roomName == "") {
                     console.error("Invalid input");
-                    return;
+                    return socket.disconnect();
                 }
 
                 const initData = { socket: socket, token: data.token, name: data.playerName, color: data.color, roomName: data.roomName };
