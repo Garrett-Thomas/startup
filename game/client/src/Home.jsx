@@ -98,7 +98,8 @@ function Home() {
 			toast("Please enter a name no longer than 20 characters");
 			return;
 		}
-		if (localStorage.getItem("roomName") == "") {
+		debugger;
+		if (!isAuthenticated || e.target.textContent == "Play" || localStorage.getItem("roomName") == "") {
 			localStorage.removeItem("roomName");
 		}
 
